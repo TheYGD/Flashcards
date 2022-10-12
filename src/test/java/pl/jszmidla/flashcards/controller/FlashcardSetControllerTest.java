@@ -1,5 +1,7 @@
 package pl.jszmidla.flashcards.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,8 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import pl.jszmidla.flashcards.data.Flashcard;
-import pl.jszmidla.flashcards.data.FlashcardSet;
+import pl.jszmidla.flashcards.data.dto.FlashcardRequest;
+import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
 import pl.jszmidla.flashcards.service.FlashcardSetService;
 
 
@@ -36,7 +38,7 @@ class FlashcardSetControllerTest {
     }
 
     @Test
-    void show_by_id() throws Exception {
+    void showById() throws Exception {
         Long id = 1L;
 
         mockMvc.perform( get("/sets/" + id) )
@@ -44,52 +46,69 @@ class FlashcardSetControllerTest {
     }
 
     @Test
-    void create_set_page() throws Exception {
+    void searchForSets() {
+        throw new RuntimeException();
+    }
+
+    @Test
+    void createSetPage() throws Exception {
         mockMvc.perform( get("/sets/create") )
                 .andExpect( view().name("flashcard-set/create") );
     }
 
     @Test
-    void create_set_post() throws Exception {
-        MockHttpServletRequestBuilder requestBuilder = create_set_request_builder();
+    void createSetPost() throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = createSetRequestBuilder();
         Long id = 1L;
-        when( flashcardSetService.create_set(any(), any()) ).thenReturn(id);
+        when( flashcardSetService.createSet(any(), any()) ).thenReturn(id);
 
         mockMvc.perform( requestBuilder )
                 .andExpect( view().name("redirect:/sets/" + id) );
     }
 
-    private MockHttpServletRequestBuilder create_set_request_builder() {
-        FlashcardSet flashcardSet = create_set();
+    private MockHttpServletRequestBuilder createSetRequestBuilder() {
+        FlashcardSetRequest flashcardSet = createSet();
+        String flashcardSetJson = convertObjectToJson(flashcardSet);
 
         MockHttpServletRequestBuilder requestBuilder = post("/sets/create")
-                .param("authorId", "1")
-                .param("authorName", "name")
-                .param("name", flashcardSet.getName())
-                .param("description", flashcardSet.getDescription());
-//                .param("flashcardList", "[{\"front\": \"front\", \"back\": \"back\"}]");
+                .contentType("application/json")
+                .content(flashcardSetJson);
 
         return requestBuilder;
     }
 
 
-    private FlashcardSet create_set() {
-        FlashcardSet flashcardSet = new FlashcardSet();
+    private FlashcardSetRequest createSet() {
+        FlashcardSetRequest flashcardSet = new FlashcardSetRequest();
         flashcardSet.setName("name");
         flashcardSet.setDescription("desc");
 
-        Flashcard flashcardDto1 = create_flashcard("front1", "back1");
-        Flashcard flashcardDto2 = create_flashcard("front2", "back2");
-        Flashcard flashcardDto3= create_flashcard("front3", "back3");
+        FlashcardRequest flashcardDto1 = createFlashcard("front1", "back1");
+        FlashcardRequest flashcardDto2 = createFlashcard("front2", "back2");
+        FlashcardRequest flashcardDto3= createFlashcard("front3", "back3");
 
-        flashcardSet.setFlashcards( List.of(flashcardDto1, flashcardDto2, flashcardDto3) );
+        flashcardSet.setFlashcardList( List.of(flashcardDto1, flashcardDto2, flashcardDto3) );
         return flashcardSet;
     }
 
-    private Flashcard create_flashcard(String front, String back) {
-        Flashcard flashcard = new Flashcard();
+    private FlashcardRequest createFlashcard(String front, String back) {
+        FlashcardRequest flashcard = new FlashcardRequest();
         flashcard.setFront(front);
         flashcard.setBack(back);
         return flashcard;
+    }
+
+    private String convertObjectToJson(Object object) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void deleteSet() {
+        throw new RuntimeException();
     }
 }

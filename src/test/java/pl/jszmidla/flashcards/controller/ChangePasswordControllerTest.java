@@ -26,14 +26,14 @@ class ChangePasswordControllerTest {
 
 
     @Test
-    void change_password_successfully() {
+    void changePasswordSuccessfully() {
         ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
         String expectedResponse = "success";
         BindingResult bindingResult = Mockito.mock(BindingResult.class);
-        when( changePasswordService.change_password(any(), any()) ).thenReturn( expectedResponse );
-        when( changePasswordService.check_if_data_is_invalid(any(), any(), any()) ).thenReturn("");
+        when( changePasswordService.changePassword(any(), any()) ).thenReturn( expectedResponse );
+        when( changePasswordService.checkIfDataIsInvalid(any(), any(), any()) ).thenReturn("");
 
-        ResponseEntity<String> actualResponse = changePasswordController.change_password(changePasswordRequest,
+        ResponseEntity<String> actualResponse = changePasswordController.changePassword(changePasswordRequest,
                                                                                          bindingResult, null);
 
         assertEquals( HttpStatus.OK, actualResponse.getStatusCode() );
@@ -41,13 +41,13 @@ class ChangePasswordControllerTest {
     }
 
     @Test
-    void change_password_failed() {
+    void changePasswordFailed() {
         ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
         String expectedResponse = "error";
         BindingResult bindingResult = Mockito.mock(BindingResult.class);
-        when( changePasswordService.check_if_data_is_invalid(any(), any(), any()) ).thenReturn(expectedResponse);
+        when( changePasswordService.checkIfDataIsInvalid(any(), any(), any()) ).thenReturn(expectedResponse);
 
-        ResponseEntity<String> actualResponse = changePasswordController.change_password(changePasswordRequest,
+        ResponseEntity<String> actualResponse = changePasswordController.changePassword(changePasswordRequest,
                 bindingResult, null);
 
         assertEquals( HttpStatus.BAD_REQUEST, actualResponse.getStatusCode() );

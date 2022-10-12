@@ -21,14 +21,14 @@ class UserMapperTest {
     UserMapper userMapper;
 
     @Test
-    void register_to_user() {
+    void registerToUser() {
         String email = "email@email.com";
         String username = "username";
         String password = "password";
         RegisterUserRequest registerUserRequest = new RegisterUserRequest(email, username, password);
         when( passwordEncoder.encode(password) ).thenReturn(password);
 
-        User user = userMapper.register_to_user(registerUserRequest);
+        User user = userMapper.registerToUser(registerUserRequest);
 
         assertEquals(email, user.getEmail());
         assertEquals(username, user.getUsername());

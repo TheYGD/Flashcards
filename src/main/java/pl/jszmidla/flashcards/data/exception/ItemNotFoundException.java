@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class ItemNotFoundException extends RuntimeException {
 
-    static String template = "%s not found!";
+    static String TEMPLATE = "%s not found!";
 
     public ItemNotFoundException(String itemName) {
-        super(template.formatted(itemName));
+        super(TEMPLATE.formatted(itemName));
     }
 }

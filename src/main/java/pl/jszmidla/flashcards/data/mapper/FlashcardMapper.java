@@ -2,22 +2,24 @@ package pl.jszmidla.flashcards.data.mapper;
 
 import org.springframework.stereotype.Component;
 import pl.jszmidla.flashcards.data.Flashcard;
-import pl.jszmidla.flashcards.data.dto.FlashcardDto;
+import pl.jszmidla.flashcards.data.dto.FlashcardRequest;
+import pl.jszmidla.flashcards.data.dto.FlashcardResponse;
 
 @Component
 public class FlashcardMapper {
 
-    public Flashcard dto_to_entity(FlashcardDto flashcardDto) {
+    public Flashcard requestToEntity(FlashcardRequest flashcardRequest) {
         Flashcard flashcard = new Flashcard();
-        flashcard.setFront(flashcardDto.getFront());
-        flashcard.setBack(flashcardDto.getBack());
+        flashcard.setFront(flashcardRequest.getFront());
+        flashcard.setBack(flashcardRequest.getBack());
         return flashcard;
     }
 
-    public FlashcardDto entity_to_dto(Flashcard flashcard) {
-        FlashcardDto flashcardDto = new FlashcardDto();
-        flashcardDto.setFront(flashcard.getFront());
-        flashcardDto.setBack(flashcard.getBack());
-        return flashcardDto;
+    public FlashcardResponse entityToResponse(Flashcard flashcard) {
+        FlashcardResponse flashcardResponse = new FlashcardResponse();
+        flashcardResponse.setId(flashcard.getId());
+        flashcardResponse.setFront(flashcard.getFront());
+        flashcardResponse.setBack(flashcard.getBack());
+        return flashcardResponse;
     }
 }

@@ -8,10 +8,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.User;
-import pl.jszmidla.flashcards.data.dto.FlashcardDto;
-import pl.jszmidla.flashcards.data.dto.FlashcardSetDto;
+import pl.jszmidla.flashcards.data.dto.FlashcardRequest;
+import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
 import pl.jszmidla.flashcards.data.exception.ForbiddenException;
 import pl.jszmidla.flashcards.data.mapper.FlashcardSetMapper;
+import pl.jszmidla.flashcards.repository.FlashcardRepository;
 import pl.jszmidla.flashcards.repository.FlashcardSetRepository;
 
 import java.util.List;
@@ -25,6 +26,8 @@ import static org.mockito.Mockito.when;
 class FlashcardSetServiceTest {
 
     @Mock
+    FlashcardRepository flashcardRepository;
+    @Mock
     FlashcardSetRepository flashcardSetRepository;
     @Mock
     FlashcardSetMapper flashcardSetMapper;
@@ -33,66 +36,72 @@ class FlashcardSetServiceTest {
 
 
     @Test
-    void find_by_id() {
+    void findById() {
         when( flashcardSetRepository.findById(any()) ).thenReturn( Optional.of(new FlashcardSet()) );
-        flashcardSetService.find_by_id(1L);
+        flashcardSetService.findById(1L);
     }
 
     @Test
-    void create_set() {
-        FlashcardSetDto flashcardSetDto = create_flashset_dto();
-        User author = create_user();
-        when( flashcardSetMapper.dto_to_entity(any()) ).thenReturn( new FlashcardSet() );
+    void createSet() {
+        FlashcardSetRequest flashcardSetRequest = createFlashsetDto();
+        User author = create_user(1);
+        when( flashcardSetMapper.requestToEntity(any()) ).thenReturn( new FlashcardSet() );
 
-        Long setId = flashcardSetService.create_set(flashcardSetDto, author);
+        Long setId = flashcardSetService.createSet(flashcardSetRequest, author);
 
         assertNull(setId);
     }
 
     @Test
-    void delete_set_success() {
-        User user = create_user();
+    void deleteSetSuccess() {
+        User user = create_user(1);
         FlashcardSet flashcardSet = Mockito.spy(FlashcardSet.class);
-        when( flashcardSet.getAuthorId() ).thenReturn(user.getId());
+        when( flashcardSet.getAuthor() ).thenReturn( user );
         when( flashcardSetRepository.findById(any()) ).thenReturn( Optional.of(flashcardSet) );
 
-        flashcardSetService.delete_set(flashcardSet.getId(), user);
+        flashcardSetService.deleteSet(flashcardSet.getId(), user);
     }
 
     @Test
-    void delete_set_fail() {
-        User user = create_user();
+    void deleteSetFail() {
+        User user = create_user(1);
+        User otherUser = create_user(2);
         FlashcardSet flashcardSet = Mockito.spy(FlashcardSet.class);
-        when( flashcardSet.getAuthorId() ).thenReturn(user.getId() + 1);
+        when( flashcardSet.getAuthor() ).thenReturn( otherUser );
         when( flashcardSetRepository.findById(any()) ).thenReturn( Optional.of(flashcardSet) );
 
-        assertThrows( ForbiddenException.class, () -> flashcardSetService.delete_set(flashcardSet.getId(), user) );
+        assertThrows( ForbiddenException.class, () -> flashcardSetService.deleteSet(flashcardSet.getId(), user) );
     }
 
 
-    private User create_user() {
+    private User create_user(long id) {
         User user = new User();
-        user.setId(1L);
+        user.setId(id);
         return user;
     }
 
-    private FlashcardSetDto create_flashset_dto() {
-        FlashcardSetDto flashcardSetDto = new FlashcardSetDto();
-        flashcardSetDto.setName("name");
-        flashcardSetDto.setDescription("desc");
+    private FlashcardSetRequest createFlashsetDto() {
+        FlashcardSetRequest flashcardSetRequest = new FlashcardSetRequest();
+        flashcardSetRequest.setName("name");
+        flashcardSetRequest.setDescription("desc");
 
-        FlashcardDto flashcardDto1 = create_flashcard_dto("front1", "back1");
-        FlashcardDto flashcardDto2 = create_flashcard_dto("front2", "back2");
-        FlashcardDto flashcardDto3= create_flashcard_dto("front3", "back3");
+        FlashcardRequest flashcardRequest1 = create_flashcard_dto("front1", "back1");
+        FlashcardRequest flashcardRequest2 = create_flashcard_dto("front2", "back2");
+        FlashcardRequest flashcardRequest3 = create_flashcard_dto("front3", "back3");
 
-        flashcardSetDto.setFlashcardList( List.of(flashcardDto1, flashcardDto2, flashcardDto3) );
-        return flashcardSetDto;
+        flashcardSetRequest.setFlashcardList( List.of(flashcardRequest1, flashcardRequest2, flashcardRequest3) );
+        return flashcardSetRequest;
     }
 
-    private FlashcardDto create_flashcard_dto(String front, String back) {
-        FlashcardDto flashcardDto = new FlashcardDto();
-        flashcardDto.setFront(front);
-        flashcardDto.setBack(back);
-        return flashcardDto;
+    private FlashcardRequest create_flashcard_dto(String front, String back) {
+        FlashcardRequest flashcardRequest = new FlashcardRequest();
+        flashcardRequest.setFront(front);
+        flashcardRequest.setBack(back);
+        return flashcardRequest;
+    }
+
+    @Test
+    void findSetsByQuery() {
+        throw new RuntimeException();
     }
 }

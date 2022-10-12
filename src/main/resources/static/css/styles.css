@@ -1,0 +1,60 @@
+
+.hover-dark:hover:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    opacity: 3%;
+    cursor: pointer;
+}
+
+#navbar {
+    background: linear-gradient(90deg, rgb(104, 189, 138) 21%, rgb(101, 203, 178) 65%, rgb(130, 203, 186) 100%);
+}
+
+.z-index-1 {
+    z-index: 1;
+}
+
+.bg-own-primary {
+    background: linear-gradient(90deg, rgb(101, 183, 152) 21%, rgb(101, 203, 178) 50%, rgb(130, 203, 186) 100%) !important;
+    color: white !important;
+}
+
+.btn-own-primary {
+    background: linear-gradient(90deg, rgb(88, 194, 160) 21%, rgb(100, 201, 179) 50%, rgb(122, 217, 199) 100%) !important;
+    color: white !important;
+}
+
+.btn-own-primary:hover {
+    background: linear-gradient(90deg, rgb(122, 203, 176) 21%, rgb(115, 204, 185) 50%, rgb(143, 210, 198) 100%) !important;
+}
+
+.flashcard-scene {
+    perspective: 1500px;
+}
+
+.flashcard {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: transform 1s;
+    transform-style: preserve-3d;
+}
+
+.flashcard-side {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    backface-visibility: hidden;
+}
+
+.flashcard-back {
+    transform: rotateY( 180deg );
+}
+.flashcard-flipped {
+    transform: rotateY(180deg);
+}

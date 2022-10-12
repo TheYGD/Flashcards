@@ -1,15 +1,11 @@
 package pl.jszmidla.flashcards.service;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import pl.jszmidla.flashcards.data.User;
@@ -32,7 +28,7 @@ class ChangePasswordServiceTest {
 
 
     @Test
-    void change_password_successfully() {
+    void changePasswordSuccessfully() {
         String message = "Password changed successfully.";
         ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
         changePasswordRequest.setNewPassword("pass");
@@ -40,46 +36,46 @@ class ChangePasswordServiceTest {
         when( userRepository.save(user) ).thenReturn(user);
         when( passwordEncoder.encode(any()) ).thenReturn(changePasswordRequest.getNewPassword());
 
-        String response = changePasswordService.change_password(changePasswordRequest, user);
+        String response = changePasswordService.changePassword(changePasswordRequest, user);
 
         assertEquals(message, response);
         assertEquals(changePasswordRequest.getNewPassword(), user.getPassword());
     }
 
     @Test
-    void given_valid_data() {
+    void givenValidData() {
         String expected = "";
         ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
         BindingResult bindingResult = Mockito.mock(BindingResult.class);
         when( bindingResult.hasFieldErrors("newPassword") ).thenReturn(false);
         when( passwordEncoder.matches(any(), any()) ).thenReturn(true);
 
-        String actual = changePasswordService.check_if_data_is_invalid(bindingResult, changePasswordRequest, new User());
+        String actual = changePasswordService.checkIfDataIsInvalid(bindingResult, changePasswordRequest, new User());
 
         assertEquals(expected, actual);
     }
 
     @Test
-    void given_invalid_old_password() {
+    void givenInvalidOldPassword() {
         String expected = "Incorrect password.";
         ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
         BindingResult bindingResult = Mockito.mock(BindingResult.class);
         when( passwordEncoder.matches(any(), any()) ).thenReturn(false);
 
-        String actual = changePasswordService.check_if_data_is_invalid(bindingResult, changePasswordRequest, new User());
+        String actual = changePasswordService.checkIfDataIsInvalid(bindingResult, changePasswordRequest, new User());
 
         assertEquals(expected, actual);
     }
 
     @Test
-    void given_invalid_new_password() {
+    void givenInvalidNewPassword() {
         String expected = "New password is invalid.";
         ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
         BindingResult bindingResult = Mockito.mock(BindingResult.class);
         when( bindingResult.hasFieldErrors("newPassword") ).thenReturn(true);
         when( passwordEncoder.matches(any(), any()) ).thenReturn(true);
 
-        String actual = changePasswordService.check_if_data_is_invalid(bindingResult, changePasswordRequest, new User());
+        String actual = changePasswordService.checkIfDataIsInvalid(bindingResult, changePasswordRequest, new User());
 
         assertEquals(expected, actual);
     }

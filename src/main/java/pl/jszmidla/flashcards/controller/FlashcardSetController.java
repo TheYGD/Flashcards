@@ -7,10 +7,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.User;
-import pl.jszmidla.flashcards.data.dto.FlashcardSetDto;
+import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
 import pl.jszmidla.flashcards.service.FlashcardSetService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @AllArgsConstructor
@@ -20,29 +21,37 @@ public class FlashcardSetController {
     private FlashcardSetService flashcardSetService;
 
     @GetMapping("/{id}")
-    public String show_by_id(@PathVariable("id") Long setId, Model model) {
-        FlashcardSet flashcardSet = flashcardSetService.find_by_id(setId);
-        model.addAttribute("flashcardSet", flashcardSet);
+    public String showById(@PathVariable("id") Long setId, Model model) {
+        FlashcardSet flashcardSet = flashcardSetService.findById(setId);
+        model.addAttribute("set", flashcardSet);
 
         return "flashcard-set/show";
     }
 
+    @GetMapping("/search")
+    public String searchForSets(@RequestParam(defaultValue = "") String query, Model model) {
+        List<FlashcardSet> setList = flashcardSetService.findSetsByQuery(query);
+        model.addAttribute("setList", setList);
+
+        return "flashcard-set/search";
+    }
+
     @GetMapping("/create")
-    public String create_set_page() {
+    public String createSetPage() {
         return "flashcard-set/create";
     }
 
-    @PostMapping("/create")
-    public String create_set_post(@ModelAttribute @Valid FlashcardSetDto flashcardSetDto,
-                                  @AuthenticationPrincipal User user) {
-        Long flashcardSetId = flashcardSetService.create_set(flashcardSetDto, user);
+    @PostMapping(value= "/create")
+    public String createSetPost(@RequestBody @Valid FlashcardSetRequest flashcardSetRequest,
+                                @AuthenticationPrincipal User user) {
+        Long flashcardSetId = flashcardSetService.createSet(flashcardSetRequest, user);
 
         return "redirect:/sets/" + flashcardSetId;
     }
 
     @DeleteMapping("/delete/{id}")
-    public String delete_set(@PathVariable("id") Long setId, @AuthenticationPrincipal User user) {
-        flashcardSetService.delete_set(setId, user);
+    public String deleteSet(@PathVariable("id") Long setId, @AuthenticationPrincipal User user) {
+        flashcardSetService.deleteSet(setId, user);
 
         return "redirect:/profile/sets"; // todo dsada
     }

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="fragments/layout :: layout(body=~{::body}, title='Search for set')">
+<body>
+  <div class="container">
+    <h1 class="mt-5">Search for flashcard sets</h1>
+
+    <div class="row">
+      <form class="row mt-3" th:action="@{/sets/search}" method="get">
+        <div class="col-11">
+          <input class="form-control" style="height: 3rem;" type="text" th:placeholder="#{flashcard-set.search.search}"
+            name="query" th:value="${param.query ?: ''}">
+        </div>
+        <button class="btn btn-dark col-1 fa fa-search" type="submit"></button>
+      </form>
+    </div>
+
+    <div class="container-fluid row justify-content-center mt-5" style="margin: 0 auto;">
+      <div class="row row-cols-4 mx-auto">
+        <div th:each="set : ${setList}" class="col p-0 pe-3">
+          <a class="card ms-2 mt-4 text-decoration-none text-black hover-dark" style="height: 15rem;"
+             th:href="${'/sets/' + set.id}">
+            <h6 class="card-header py-3 bg-own-primary hover-light" th:text="${set.name}">Name</h6>
+            <p class="p-3" th:text="${set.description}">Description</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

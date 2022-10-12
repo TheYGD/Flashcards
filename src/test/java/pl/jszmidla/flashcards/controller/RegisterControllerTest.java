@@ -35,13 +35,13 @@ class RegisterControllerTest {
 
 
     @Test
-    void register_page() throws Exception {
+    void registerPage() throws Exception {
         mockMvc.perform(get("/register"))
                 .andExpect( view().name("user/register") );
     }
 
     @Test
-    void register_post_success() throws Exception {
+    void registerPostSuccess() throws Exception {
         String email = "email@email.com";
         String username = "username";
         String password = "password";
@@ -51,14 +51,14 @@ class RegisterControllerTest {
                 .param("username", username)
                 .param("password", password);
 
-        when( registerService.check_if_data_is_valid(any()) ).thenReturn(null);
+        when( registerService.checkIfDataIsValid(any()) ).thenReturn(null);
 
         mockMvc.perform(requestBuilder)
                 .andExpect( view().name("redirect:/") );
     }
 
     @Test
-    void register_post_fail() throws Exception {
+    void registerPostFail() throws Exception {
         String email = "email@email.com";
         String username = "username";
         String password = "password";
@@ -68,7 +68,7 @@ class RegisterControllerTest {
                 .param("username", username)
                 .param("password", password);
 
-        when( registerService.check_if_data_is_valid(any()) ).thenReturn(new ObjectError("", ""));
+        when( registerService.checkIfDataIsValid(any()) ).thenReturn(new ObjectError("", ""));
 
         mockMvc.perform(requestBuilder)
                 .andExpect( view().name("redirect:/register") );

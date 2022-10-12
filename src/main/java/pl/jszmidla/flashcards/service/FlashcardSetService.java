@@ -4,11 +4,15 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.User;
-import pl.jszmidla.flashcards.data.dto.FlashcardSetDto;
+import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
 import pl.jszmidla.flashcards.data.exception.FlashcardSetNotFoundException;
 import pl.jszmidla.flashcards.data.exception.ForbiddenException;
 import pl.jszmidla.flashcards.data.mapper.FlashcardSetMapper;
+import pl.jszmidla.flashcards.repository.FlashcardRepository;
 import pl.jszmidla.flashcards.repository.FlashcardSetRepository;
+
+import javax.transaction.Transactional;
+import java.util.List;
 
 
 @Service
@@ -16,26 +20,35 @@ import pl.jszmidla.flashcards.repository.FlashcardSetRepository;
 public class FlashcardSetService {
 
     private FlashcardSetRepository flashcardSetRepository;
+    private FlashcardRepository flashcardRepository;
     private FlashcardSetMapper flashcardSetMapper;
 
-    public FlashcardSet find_by_id(Long id) {
+    public FlashcardSet findById(Long id) {
         return flashcardSetRepository.findById(id).orElseThrow(FlashcardSetNotFoundException::new);
     }
 
-    public Long create_set(FlashcardSetDto flashcardSetDto, User user) {
-        FlashcardSet flashcardSet = flashcardSetMapper.dto_to_entity(flashcardSetDto);
-        flashcardSet.setAuthorId(user.getId());
+    @Transactional
+    public Long createSet(FlashcardSetRequest flashcardSetRequest, User user) {
+        FlashcardSet flashcardSet = flashcardSetMapper.requestToEntity(flashcardSetRequest);
+        flashcardSet.setAuthor(user);
+
+        flashcardRepository.saveAll(flashcardSet.getFlashcards());
         flashcardSetRepository.save(flashcardSet);
 
         return flashcardSet.getId();
     }
 
-    public void delete_set(Long setId, User user) {
-        FlashcardSet flashcardSet = find_by_id(setId);
-        if (!flashcardSet.getAuthorId().equals(user.getId())) {
+    public void deleteSet(Long setId, User user) {
+        FlashcardSet flashcardSet = findById(setId);
+        if (!flashcardSet.getAuthor().getId().equals(user.getId())) {
             throw new ForbiddenException();
         }
 
         flashcardSetRepository.removeById(setId);
+    }
+
+    public List<FlashcardSet> findSetsByQuery(String query) {
+        List<FlashcardSet> setList = flashcardSetRepository.findAllByNameContaining(query);
+        return setList;
     }
 }

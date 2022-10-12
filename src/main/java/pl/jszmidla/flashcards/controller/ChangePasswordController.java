@@ -24,14 +24,14 @@ public class ChangePasswordController {
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<String> change_password(@RequestBody @Valid ChangePasswordRequest changePasswordRequest,
-                                                  BindingResult bindingResult, @AuthenticationPrincipal User user) {
-        String possibleError = changePasswordService.check_if_data_is_invalid(bindingResult, changePasswordRequest, user);
+    public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordRequest changePasswordRequest,
+                                                 BindingResult bindingResult, @AuthenticationPrincipal User user) {
+        String possibleError = changePasswordService.checkIfDataIsInvalid(bindingResult, changePasswordRequest, user);
         if (!possibleError.isBlank()) {
             return ResponseEntity.badRequest().body(possibleError);
         }
 
-        String responseBody = changePasswordService.change_password(changePasswordRequest, user);
+        String responseBody = changePasswordService.changePassword(changePasswordRequest, user);
         return ResponseEntity.ok(responseBody);
     }
 }

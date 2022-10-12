@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.FORBIDDEN)
 public class ForbiddenException extends RuntimeException {
 
-    static String message = "Operation forbidden!";
+    static String MESSAGE = "Operation forbidden!";
 
     public ForbiddenException() {
-        super(message);
+        super(MESSAGE);
     }
 }

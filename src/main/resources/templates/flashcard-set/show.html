@@ -1,10 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Flashcard Set</title>
-</head>
+<html lang="en" th:replace="fragments/layout :: layout(body=~{::body}, title='set-name', script=~{::script})">
+
 <body>
-  <h1>Flashcard set</h1>
+  <div class="container">
+      <h1 class="mt-5" th:text="${set.name}">Set name</h1>
+      <p th:text="${'Author: ' + set.author.username}">Author</p>
+      <p th:text="${set.description}">Description</p>
+      <hr/>
+
+      <div class="flashcard-scene row justify-content-center mt-5">
+        <div class="flashcard border border-2 rounded-1 shadow-sm p-3 mt-5"
+             style="width: 25rem; height: 30rem;">
+            <div class="flashcard-side pb-4">
+                <div class="d-flex align-items-center justify-content-center pb-3" style="height: 75%;">
+                    <h3 id="flashcard-front-text" class="text-center">Text</h3>
+                </div>
+            </div>
+            <div class="flashcard-side flashcard-back pb-4">
+                <div class="d-flex align-items-center justify-content-center pb-3" style="height: 75%;">
+                    <h3 id="flashcard-back-text" class="text-center">Text</h3>
+                </div>
+
+                <div class="row" style="height: 25%">
+                    <div class="col-4 offset-2 d-flex align-items-center justify-content-center">
+                        <button class="btn border border-2 border-success opacity-75 btn-outline-success fa fa-check
+                        rounded-circle z-index-1" style="height: 4rem; width: 4rem;" type="button" id="success-btn"></button>
+                    </div>
+
+                    <div class="col-4 offset-1 d-flex align-items-center justify-content-center">
+                        <button class="btn border border-2 border-danger opacity-75 btn-outline-danger fa fa-x
+                        rounded-circle z-index-1" style="height: 4rem; width: 4rem;" type="button" id="fail-btn"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+  </div>
 </body>
+
+
+<script th:inline="javascript">
+    let setId = /*[[${set.id}]]*/ '';
+    let flashcardList = [];
+
+    init();
+    async function init() {
+        flashcardList = await getFlashcards();
+        initFlashcard();
+        initFlashcardButtons();
+        showNextCard();
+    }
+
+
+    async function getFlashcards() {
+        let url = location.origin + '/api/v1/flashcards' + '?setId=' + setId;
+
+        await fetch(url)
+            .then(res => {
+                return res.json();
+            })
+            .then(res => {
+                flashcardList = res;
+            });
+    }
+
+    function initFlashcard() {
+        let flashcard = $('.flashcard')[0];
+        flashcard.onclick = function() {
+            flashcard.classList.toggle('flashcard-flipped');
+        }
+    }
+
+    function initFlashcardButtons() {
+        let successBtn = $('#success-btn')[0];
+        successBtn.onclick = function(e) {
+            e.stopPropagation();
+        }
+
+        let failBtn = $('#fail-btn')[0];
+        failBtn.onclick = function(e) {
+            e.stopPropagation();
+        }
+    }
+
+    function setTextOnFlashcard(frontText, backText) {
+        let front = $('#flashcard-front-text')[0];
+        front.text = frontText;
+
+        let back = $('#flashcard-back-text')[0];
+        back.text = backText;
+    }
+
+    function markFlashcardAsSuccess(flashcard) {
+        markFlashcardAsSuccessOnServer(flashcard.id);
+        showNextCard();
+    }
+
+    function markFlashcardAsFail(flashcard) {
+        flashcardList.push(flashcard);
+        showNextCard();
+    }
+
+    function setFlashcardButtonsWithId(flashcard) {
+        let successBtn = $('#success-btn')[0];
+        successBtn.onclick = markFlashcardAsSuccess(flashcard);
+
+        let failBtn = $('#fail-btn')[0];
+        failBtn.onclick = markFlashcardAsFail(flashcard);
+    }
+
+    function showNextCard() {
+        let flashcard = flashcardList.shift();
+        let frontText = flashcard.front;
+        let backText = flashcard.back;
+        setTextOnFlashcard(frontText, backText);
+        setFlashcardButtonsWithId(flashcard);
+    }
+
+    function markFlashcardAsSuccessOnServer(flashcardId) {
+        let url = location.origin + `/api/v1/flashcards/${flashcardId}/remembered`;
+        fetch(url, {
+            method: 'POST';
+        })
+    }
+
+</script>
+
 </html>

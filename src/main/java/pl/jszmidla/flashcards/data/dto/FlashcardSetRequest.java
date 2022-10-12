@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class FlashcardSetDto {
+public class FlashcardSetRequest {
     private Long authorId;
     private String authorName;
 
@@ -23,5 +23,5 @@ public class FlashcardSetDto {
 
     @NotNull
     @Size(min=1, max=500)
-    private List<FlashcardDto> flashcardList;
+    private List<FlashcardRequest> flashcardList;
 }

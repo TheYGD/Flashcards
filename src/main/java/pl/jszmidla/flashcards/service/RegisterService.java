@@ -3,6 +3,7 @@ package pl.jszmidla.flashcards.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.ObjectError;
+import pl.jszmidla.flashcards.data.Role;
 import pl.jszmidla.flashcards.data.User;
 import pl.jszmidla.flashcards.data.dto.RegisterUserRequest;
 import pl.jszmidla.flashcards.data.mapper.UserMapper;
@@ -15,12 +16,13 @@ public class RegisterService {
     private UserRepository userRepository;
     private UserMapper userMapper;
 
-    public void register_user(RegisterUserRequest registerUserRequest) {
-        User user = userMapper.register_to_user(registerUserRequest);
+    public void registerUser(RegisterUserRequest registerUserRequest) {
+        User user = userMapper.registerToUser(registerUserRequest);
+        user.setRole(Role.USER);
         userRepository.save(user);
     }
 
-    public ObjectError check_if_data_is_valid(RegisterUserRequest registerUserRequest) {
+    public ObjectError checkIfDataIsValid(RegisterUserRequest registerUserRequest) {
         if (isEmailTaken(registerUserRequest.getEmail())) {
             return new ObjectError("email", "Email is taken!");
         }

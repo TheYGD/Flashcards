@@ -12,7 +12,7 @@ public class UserMapper {
 
     private PasswordEncoder passwordEncoder;
 
-    public User register_to_user(RegisterUserRequest register) {
+    public User registerToUser(RegisterUserRequest register) {
         String encodedPassword = passwordEncoder.encode( register.getPassword() );
         User user = new User();
         user.setEmail(register.getEmail());

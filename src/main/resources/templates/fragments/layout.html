@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" th:fragment="layout (body, title)" th:with="script=${script}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title + ' - Flashcards'}">Title</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/webjars/bootstrap/5.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/webjars/font-awesome/6.2.0/css/all.css"/>
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm sticky-md-top navbar-dark px-3" id="navbar">
+        <a class="navbar-brand me-4" href="/">Flashcards</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        </button>
+
+        <div class="collapse navbar-collapse row align-items-center" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-white text-end" id="nav-search" th:text="#{fragments.layout.search}"
+                       th:href="@{'/sets/search'}"> search for sets
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link me-3" th:href="@{/sets/create}"> <i class="fa fa-plus me-1 text-white"></i>
+                        <span th:text="#{fragments.layout.create-set}" class="text-white">Create set</span>
+                    </a>
+                </li>
+
+                <li class="nav-item text-end">
+                    <a class="nav-link text-white text-end" id="nav-profile" th:text="${username ?: #messages.msg('fragments.layout.login') }"
+                       th:href="@{__(${username != null ? '/profiles/own' : '/login' })__}"> username
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <th:block th:replace="${body}" />
+
+    <footer class="footer bg-dark mt-5">
+    </footer>
+
+    <!--  scripts  -->
+    <script src="/webjars/bootstrap/5.2.0/js/bootstrap.min.js"></script>
+    <script src="/webjars/jquery/3.6.1/jquery.min.js"></script>
+    <th:block th:if="${script}">
+        <script th:replace="${script}"></script>
+    </th:block>
+
+
+</body>
+</html>

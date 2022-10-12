@@ -2,9 +2,9 @@ package pl.jszmidla.flashcards.data.exception;
 
 public class FlashcardSetNotFoundException extends ItemNotFoundException {
 
-    static String itemName = "Flashcard set";
+    static String ITEM_NAME = "Flashcard set";
 
     public FlashcardSetNotFoundException() {
-        super(itemName);
+        super(ITEM_NAME);
     }
 }

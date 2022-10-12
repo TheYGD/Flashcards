@@ -1,8 +1,6 @@
 package pl.jszmidla.flashcards.controller;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -17,21 +15,20 @@ import javax.validation.Valid;
 
 @Controller
 @AllArgsConstructor
-@NoArgsConstructor
 @RequestMapping("/register")
 public class RegisterController {
 
     private RegisterService registerService;
 
     @GetMapping
-    public String register_page() {
+    public String registerPage() {
         return "user/register";
     }
 
     @PostMapping
-    public String register_post(@ModelAttribute @Valid RegisterUserRequest registerUserRequest,
-                                BindingResult bindingResult) {
-        ObjectError possibleError = registerService.check_if_data_is_valid(registerUserRequest);
+    public String registerPost(@ModelAttribute @Valid RegisterUserRequest registerUserRequest,
+                               BindingResult bindingResult) {
+        ObjectError possibleError = registerService.checkIfDataIsValid(registerUserRequest);
         if (possibleError != null) {
             bindingResult.addError(possibleError);
         }
@@ -39,8 +36,9 @@ public class RegisterController {
             return "redirect:/register";
         }
 
-        registerService.register_user(registerUserRequest);
+        registerService.registerUser(registerUserRequest);
 
         return "redirect:/";
     }
+
 }

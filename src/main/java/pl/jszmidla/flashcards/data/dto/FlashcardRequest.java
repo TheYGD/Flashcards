@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 @Getter
 @Setter
-public class FlashcardDto {
+public class FlashcardRequest {
 
     @NotNull
     @Size(max=100)

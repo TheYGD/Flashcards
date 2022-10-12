@@ -8,3 +8,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+  messages:
+    encoding: UTF-8
+  thymeleaf:
+    encoding: UTF-8
