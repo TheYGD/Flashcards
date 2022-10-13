@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.dto.FlashcardRequest;
 import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
 import pl.jszmidla.flashcards.service.FlashcardSetService;
@@ -17,10 +18,11 @@ import pl.jszmidla.flashcards.service.FlashcardSetService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @ExtendWith({MockitoExtension.class})
@@ -46,8 +48,14 @@ class FlashcardSetControllerTest {
     }
 
     @Test
-    void searchForSets() {
-        throw new RuntimeException();
+    void searchForSets() throws Exception {
+        List<FlashcardSet> flashcardSets = new LinkedList<>();
+        String query = "search";
+        when( flashcardSetService.findSetsByQuery(any()) ).thenReturn(flashcardSets);
+
+        mockMvc.perform( get("/sets/search?query=" + query) )
+                .andExpect( model().attribute("setList", flashcardSets) )
+                .andExpect( view().name("flashcard-set/search") );
     }
 
     @Test
@@ -108,7 +116,9 @@ class FlashcardSetControllerTest {
     }
 
     @Test
-    void deleteSet() {
-        throw new RuntimeException();
+    void deleteSet() throws Exception {
+        long id = 1;
+        mockMvc.perform(delete("/sets/delete/" + id))
+                .andExpect( view().name("redirect:/profile/sets") );
     }
 }

@@ -73,6 +73,13 @@ class FlashcardSetServiceTest {
         assertThrows( ForbiddenException.class, () -> flashcardSetService.deleteSet(flashcardSet.getId(), user) );
     }
 
+    @Test
+    void findSetsByQuery() {
+        String query = "someQuery";
+        when( flashcardSetRepository.findAllByNameContaining(any()) ).thenReturn( List.of(new FlashcardSet()) );
+        flashcardSetService.findSetsByQuery(query);
+    }
+
 
     private User create_user(long id) {
         User user = new User();
@@ -98,10 +105,5 @@ class FlashcardSetServiceTest {
         flashcardRequest.setFront(front);
         flashcardRequest.setBack(back);
         return flashcardRequest;
-    }
-
-    @Test
-    void findSetsByQuery() {
-        throw new RuntimeException();
     }
 }

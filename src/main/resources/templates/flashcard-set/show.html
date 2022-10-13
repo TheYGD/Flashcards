@@ -120,8 +120,8 @@
     function markFlashcardAsSuccessOnServer(flashcardId) {
         let url = location.origin + `/api/v1/flashcards/${flashcardId}/remembered`;
         fetch(url, {
-            method: 'POST';
-        })
+            method: 'POST'
+        });
     }
 
 </script>

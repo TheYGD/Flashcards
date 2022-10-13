@@ -19,7 +19,7 @@ public class FlashcardService {
     public List<FlashcardResponse> getFlashcardsFromSet(Long id) {
         FlashcardSet set = flashcardSetService.findById(id);
         List<FlashcardResponse> flashcardList = set.getFlashcards().stream()
-                .map( flashcardMapper::entityToResponse)
+                .map(flashcardMapper::entityToResponse)
                 .toList();
 
         return flashcardList;
