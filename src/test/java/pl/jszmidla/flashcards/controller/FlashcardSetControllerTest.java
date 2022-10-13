@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.dto.FlashcardRequest;
 import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
+import pl.jszmidla.flashcards.data.dto.FlashcardSetResponse;
 import pl.jszmidla.flashcards.service.FlashcardSetService;
 
 
@@ -41,20 +42,19 @@ class FlashcardSetControllerTest {
 
     @Test
     void showById() throws Exception {
-        Long id = 1L;
-
+        long id = 1L;
         mockMvc.perform( get("/sets/" + id) )
                 .andExpect( view().name("flashcard-set/show") );
     }
 
     @Test
     void searchForSets() throws Exception {
-        List<FlashcardSet> flashcardSets = new LinkedList<>();
+        List<FlashcardSetResponse> flashcardSetResponseList = new LinkedList<>();
         String query = "search";
-        when( flashcardSetService.findSetsByQuery(any()) ).thenReturn(flashcardSets);
+        when( flashcardSetService.findSetsByQuery(any()) ).thenReturn(flashcardSetResponseList);
 
         mockMvc.perform( get("/sets/search?query=" + query) )
-                .andExpect( model().attribute("setList", flashcardSets) )
+                .andExpect( model().attribute("setList", flashcardSetResponseList) )
                 .andExpect( view().name("flashcard-set/search") );
     }
 

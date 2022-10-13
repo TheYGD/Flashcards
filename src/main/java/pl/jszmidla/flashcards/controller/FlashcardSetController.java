@@ -5,9 +5,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.User;
 import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
+import pl.jszmidla.flashcards.data.dto.FlashcardSetResponse;
 import pl.jszmidla.flashcards.service.FlashcardSetService;
 
 import javax.validation.Valid;
@@ -22,7 +22,7 @@ public class FlashcardSetController {
 
     @GetMapping("/{id}")
     public String showById(@PathVariable("id") Long setId, Model model) {
-        FlashcardSet flashcardSet = flashcardSetService.findById(setId);
+        FlashcardSetResponse flashcardSet = flashcardSetService.findResponseById(setId);
         model.addAttribute("set", flashcardSet);
 
         return "flashcard-set/show";
@@ -30,7 +30,7 @@ public class FlashcardSetController {
 
     @GetMapping("/search")
     public String searchForSets(@RequestParam(defaultValue = "") String query, Model model) {
-        List<FlashcardSet> setList = flashcardSetService.findSetsByQuery(query);
+        List<FlashcardSetResponse> setList = flashcardSetService.findSetsByQuery(query);
         model.addAttribute("setList", setList);
 
         return "flashcard-set/search";

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.User;
 import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
+import pl.jszmidla.flashcards.data.dto.FlashcardSetResponse;
 import pl.jszmidla.flashcards.data.exception.FlashcardSetNotFoundException;
 import pl.jszmidla.flashcards.data.exception.ForbiddenException;
 import pl.jszmidla.flashcards.data.mapper.FlashcardSetMapper;
@@ -23,8 +24,13 @@ public class FlashcardSetService {
     private FlashcardRepository flashcardRepository;
     private FlashcardSetMapper flashcardSetMapper;
 
+
     public FlashcardSet findById(Long id) {
         return flashcardSetRepository.findById(id).orElseThrow(FlashcardSetNotFoundException::new);
+    }
+    public FlashcardSetResponse findResponseById(Long id) {
+        FlashcardSet flashcardSet = findById(id);
+        return flashcardSetMapper.entityToResponse(flashcardSet);
     }
 
     @Transactional
@@ -39,16 +45,18 @@ public class FlashcardSetService {
     }
 
     public void deleteSet(Long setId, User user) {
-        FlashcardSet flashcardSet = findById(setId);
-        if (!flashcardSet.getAuthor().getId().equals(user.getId())) {
+        FlashcardSetResponse flashcardSet = findResponseById(setId);
+        if (!flashcardSet.getAuthorId().equals(user.getId())) {
             throw new ForbiddenException();
         }
 
         flashcardSetRepository.removeById(setId);
     }
 
-    public List<FlashcardSet> findSetsByQuery(String query) {
-        List<FlashcardSet> setList = flashcardSetRepository.findAllByNameContaining(query);
-        return setList;
+    public List<FlashcardSetResponse> findSetsByQuery(String query) {
+        List<FlashcardSetResponse> setResponseList = flashcardSetRepository.findAllByNameContaining(query).stream()
+                .map(flashcardSetMapper::entityToResponse)
+                .toList();
+        return setResponseList;
     }
 }

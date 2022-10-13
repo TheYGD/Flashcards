@@ -30,7 +30,7 @@
 
                 <li class="nav-item text-end">
                     <a class="nav-link text-white text-end" id="nav-profile" th:text="${username ?: #messages.msg('fragments.layout.login') }"
-                       th:href="@{__(${username != null ? '/profiles/own' : '/login' })__}"> username
+                       th:href="@{__(${username != null ? '/profile' : '/login' })__}"> username
                     </a>
                 </li>
             </ul>

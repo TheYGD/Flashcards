@@ -4,7 +4,11 @@
 <body>
   <div class="container">
       <h1 class="mt-5" th:text="${set.name}">Set name</h1>
-      <p th:text="${'Author: ' + set.author.username}">Author</p>
+      <p>
+          Author:
+          <a class="text-own-green text-decoration-none" th:href="@{__${'/profiles/' + set.authorId}__}"
+             th:text="${' ' + set.authorName}">Username</a>
+      </p>
       <p th:text="${set.description}">Description</p>
       <hr/>
 
@@ -46,22 +50,26 @@
     init();
     async function init() {
         flashcardList = await getFlashcards();
+        console.log(flashcardList);
+        console.log(3);
         initFlashcard();
-        initFlashcardButtons();
         showNextCard();
     }
 
 
     async function getFlashcards() {
-        let url = location.origin + '/api/v1/flashcards' + '?setId=' + setId;
+        let url = location.origin + `/api/v1/flashcard-sets/${setId}`;
 
+        let result;
         await fetch(url)
             .then(res => {
                 return res.json();
             })
             .then(res => {
-                flashcardList = res;
+                result = res;
             });
+
+        return result;
     }
 
     function initFlashcard() {
@@ -71,24 +79,12 @@
         }
     }
 
-    function initFlashcardButtons() {
-        let successBtn = $('#success-btn')[0];
-        successBtn.onclick = function(e) {
-            e.stopPropagation();
-        }
-
-        let failBtn = $('#fail-btn')[0];
-        failBtn.onclick = function(e) {
-            e.stopPropagation();
-        }
-    }
-
     function setTextOnFlashcard(frontText, backText) {
         let front = $('#flashcard-front-text')[0];
-        front.text = frontText;
+        front.innerHTML = frontText;
 
         let back = $('#flashcard-back-text')[0];
-        back.text = backText;
+        back.innerHTML = backText;
     }
 
     function markFlashcardAsSuccess(flashcard) {
@@ -103,10 +99,16 @@
 
     function setFlashcardButtonsWithId(flashcard) {
         let successBtn = $('#success-btn')[0];
-        successBtn.onclick = markFlashcardAsSuccess(flashcard);
+        successBtn.onclick = (o) => {
+            markFlashcardAsSuccess(flashcard);
+            o.stopPropagation();
+        }
 
         let failBtn = $('#fail-btn')[0];
-        failBtn.onclick = markFlashcardAsFail(flashcard);
+        failBtn.onclick = (o) => {
+            markFlashcardAsFail(flashcard);
+            o.stopPropagation();
+        }
     }
 
     function showNextCard() {
@@ -118,7 +120,7 @@
     }
 
     function markFlashcardAsSuccessOnServer(flashcardId) {
-        let url = location.origin + `/api/v1/flashcards/${flashcardId}/remembered`;
+        let url = location.origin + `/api/v1/flashcard-sets/${setId}/remembered/${flashcardId}`;
         fetch(url, {
             method: 'POST'
         });

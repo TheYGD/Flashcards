@@ -20,11 +20,15 @@ public class SecurityConfig {
         http
             .csrf().disable()
             .authorizeRequests()
+                .mvcMatchers("/sets/create").authenticated()
+                .mvcMatchers("/sets/delete/*").authenticated()
+
                 .mvcMatchers("/").permitAll()
                 .mvcMatchers("/register").permitAll()
                 .mvcMatchers("/js/**", "/css/**", "/webjars/**").permitAll()
+                .mvcMatchers("/sets/**").permitAll()
 
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
             .and()
             .formLogin( form -> form
 //                .loginPage("/login")

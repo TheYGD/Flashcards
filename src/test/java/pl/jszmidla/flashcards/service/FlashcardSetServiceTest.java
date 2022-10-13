@@ -1,16 +1,21 @@
 package pl.jszmidla.flashcards.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.jszmidla.flashcards.data.Flashcard;
 import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.User;
 import pl.jszmidla.flashcards.data.dto.FlashcardRequest;
 import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
+import pl.jszmidla.flashcards.data.dto.FlashcardSetResponse;
 import pl.jszmidla.flashcards.data.exception.ForbiddenException;
+import pl.jszmidla.flashcards.data.mapper.FlashcardMapper;
 import pl.jszmidla.flashcards.data.mapper.FlashcardSetMapper;
 import pl.jszmidla.flashcards.repository.FlashcardRepository;
 import pl.jszmidla.flashcards.repository.FlashcardSetRepository;
@@ -29,10 +34,16 @@ class FlashcardSetServiceTest {
     FlashcardRepository flashcardRepository;
     @Mock
     FlashcardSetRepository flashcardSetRepository;
-    @Mock
-    FlashcardSetMapper flashcardSetMapper;
+    FlashcardSetMapper flashcardSetMapper = new FlashcardSetMapper(new FlashcardMapper());
     @InjectMocks
     FlashcardSetService flashcardSetService;
+
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        flashcardSetService = new FlashcardSetService(flashcardSetRepository, flashcardRepository, flashcardSetMapper);
+    }
 
 
     @Test
@@ -43,9 +54,9 @@ class FlashcardSetServiceTest {
 
     @Test
     void createSet() {
-        FlashcardSetRequest flashcardSetRequest = createFlashsetDto();
-        User author = create_user(1);
-        when( flashcardSetMapper.requestToEntity(any()) ).thenReturn( new FlashcardSet() );
+        FlashcardSetRequest flashcardSetRequest = createFlashcardSetDto();
+        FlashcardSet flashcardSet = createFlashcardSet();
+        User author = flashcardSet.getAuthor();
 
         Long setId = flashcardSetService.createSet(flashcardSetRequest, author);
 
@@ -76,7 +87,9 @@ class FlashcardSetServiceTest {
     @Test
     void findSetsByQuery() {
         String query = "someQuery";
-        when( flashcardSetRepository.findAllByNameContaining(any()) ).thenReturn( List.of(new FlashcardSet()) );
+        FlashcardSet flashcardSet = createFlashcardSet();
+        when( flashcardSetRepository.findAllByNameContaining(any()) ).thenReturn( List.of(flashcardSet) );
+
         flashcardSetService.findSetsByQuery(query);
     }
 
@@ -87,7 +100,7 @@ class FlashcardSetServiceTest {
         return user;
     }
 
-    private FlashcardSetRequest createFlashsetDto() {
+    private FlashcardSetRequest createFlashcardSetDto() {
         FlashcardSetRequest flashcardSetRequest = new FlashcardSetRequest();
         flashcardSetRequest.setName("name");
         flashcardSetRequest.setDescription("desc");
@@ -105,5 +118,31 @@ class FlashcardSetServiceTest {
         flashcardRequest.setFront(front);
         flashcardRequest.setBack(back);
         return flashcardRequest;
+    }
+
+    @Test
+    void findResponseById() {
+        FlashcardSet flashcardSet = createFlashcardSet();
+        when( flashcardSetRepository.findById(any()) ).thenReturn(Optional.of(flashcardSet));
+
+        FlashcardSetResponse flashcardSetResponse = flashcardSetService.findResponseById(any());
+
+        assertEquals(flashcardSet.getId(), flashcardSetResponse.getId());
+        assertEquals(flashcardSet.getName(), flashcardSetResponse.getName());
+        assertEquals(flashcardSet.getDescription(), flashcardSetResponse.getDescription());
+        assertEquals(flashcardSet.getAuthor().getId(), flashcardSetResponse.getAuthorId());
+        assertEquals(flashcardSet.getAuthor().getUsername(), flashcardSetResponse.getAuthorName());
+    }
+
+    private FlashcardSet createFlashcardSet() {
+        User author = create_user(1);
+        author.setUsername("arturitto");
+
+        FlashcardSet flashcardSet = new FlashcardSet();
+        flashcardSet.setName("name");
+        flashcardSet.setDescription("desc");
+        flashcardSet.setAuthor(author);
+
+        return flashcardSet;
     }
 }

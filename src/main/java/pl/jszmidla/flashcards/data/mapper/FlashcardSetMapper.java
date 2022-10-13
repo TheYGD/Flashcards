@@ -22,4 +22,14 @@ public class FlashcardSetMapper {
 
         return flashcardSet;
     }
+
+    public FlashcardSetResponse entityToResponse(FlashcardSet flashcardSet) {
+        FlashcardSetResponse flashcardSetResponse = new FlashcardSetResponse();
+        flashcardSetResponse.setId(flashcardSet.getId());
+        flashcardSetResponse.setAuthorId(flashcardSet.getAuthor().getId());
+        flashcardSetResponse.setAuthorName(flashcardSet.getAuthor().getUsername());
+        flashcardSetResponse.setName(flashcardSet.getName());
+        flashcardSetResponse.setDescription(flashcardSet.getDescription());
+        return flashcardSetResponse;
+    }
 }

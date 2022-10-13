@@ -33,6 +33,10 @@
     background: linear-gradient(90deg, rgb(122, 203, 176) 21%, rgb(115, 204, 185) 50%, rgb(143, 210, 198) 100%) !important;
 }
 
+.text-own-green {
+    color: rgb(100, 201, 179) !important;
+}
+
 .flashcard-scene {
     perspective: 1500px;
 }
