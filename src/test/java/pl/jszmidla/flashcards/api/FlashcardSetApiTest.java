@@ -10,7 +10,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.jszmidla.flashcards.data.dto.FlashcardResponse;
-import pl.jszmidla.flashcards.service.FlashcardService;
+import pl.jszmidla.flashcards.data.dto.RememberedAndUnrememberedFlashcardsSplitted;
+import pl.jszmidla.flashcards.service.FlashcardSetService;
 
 import java.util.List;
 
@@ -23,21 +24,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 class FlashcardSetApiTest {
 
     @Mock
-    FlashcardService flashcardService;
+    FlashcardSetService flashcardSetService;
     MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup( new FlashcardSetApi(flashcardService) ).build();
+        mockMvc = MockMvcBuilders.standaloneSetup( new FlashcardSetApi(flashcardSetService) ).build();
     }
 
     @Test
-    void getFlashcardsFromSet() throws Exception {
+    void getUnrememberedFlashcardsFromSet() throws Exception {
         FlashcardResponse flashcardResponse = createFlashCardResponse(1, "fr1", "bc1");
-        List<FlashcardResponse> flashcardResponseList = List.of(flashcardResponse);
-        String responseJson = parseObjectToJson(flashcardResponseList);
-        when( flashcardService.getFlashcardsFromSet(any()) ).thenReturn( flashcardResponseList );
+        RememberedAndUnrememberedFlashcardsSplitted flashcardsSplitted = new RememberedAndUnrememberedFlashcardsSplitted();
+        flashcardsSplitted.setRememberedFlashcardList(List.of(flashcardResponse));
+        String responseJson = parseObjectToJson(flashcardsSplitted);
+        when( flashcardSetService.getSplittedFlashcardsFromSet(any(), any()) ).thenReturn( flashcardsSplitted );
 
         MvcResult result = mockMvc.perform(get("/api/v1/flashcard-sets/" + 1))
                 .andReturn();

@@ -5,8 +5,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.jszmidla.flashcards.data.User;
 import pl.jszmidla.flashcards.data.dto.FlashcardResponse;
-import pl.jszmidla.flashcards.service.FlashcardService;
+import pl.jszmidla.flashcards.data.dto.RememberedAndUnrememberedFlashcardsSplitted;
+import pl.jszmidla.flashcards.service.FlashcardSetService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -14,18 +16,39 @@ import java.util.List;
 @AllArgsConstructor
 public class FlashcardSetApi {
 
-    private FlashcardService flashcardService;
+    private FlashcardSetService flashcardSetService;
 
     @GetMapping("/{setId}")
-    public List<FlashcardResponse> getFlashcardsFromSet(@PathVariable Long setId) {
-        List<FlashcardResponse> flashcardList = flashcardService.getFlashcardsFromSet(setId);
+    public RememberedAndUnrememberedFlashcardsSplitted getFlashcardsFromSet(@PathVariable Long setId,
+                                                                            @AuthenticationPrincipal User user) {
+        RememberedAndUnrememberedFlashcardsSplitted flashcardList =
+                flashcardSetService.getSplittedFlashcardsFromSet(setId, user);
         return flashcardList;
     }
 
+    @GetMapping(value = "/{setId}/expire")
+    public LocalDateTime getSetExpirationDate(@PathVariable Long setId, @AuthenticationPrincipal User user) {
+        LocalDateTime expirationDate = flashcardSetService.getSetExpirationDate(setId, user);
+        return expirationDate;
+    }
+
     @PostMapping("/{setId}/remembered/{flashcardId}")
-    public String markFlashcardAsRemembered(@PathVariable Long setId, @PathVariable Long flashcardId,
+    public String markFlashcardFromSetAsRemembered(@PathVariable Long setId, @PathVariable Long flashcardId,
                                             @AuthenticationPrincipal User user) {
-        flashcardService.markFlashcardAsRemembered(setId, flashcardId, user);
+        flashcardSetService.markFlashcardFromSetAsRemembered(setId, flashcardId, user);
         return "Success";
     }
+
+    @PostMapping("/{setId}/completed")
+    public String markSetAsCompleted(@PathVariable Long setId, @AuthenticationPrincipal User user) {
+        flashcardSetService.markSetAsCompleted(setId, user);
+        return "Success";
+    }
+
+    @PostMapping("/{setId}/reload")
+    public String reloadSetSooner(@PathVariable Long setId, @AuthenticationPrincipal User user) {
+        flashcardSetService.reloadSetSooner(setId, user);
+        return "Success";
+    }
+
 }

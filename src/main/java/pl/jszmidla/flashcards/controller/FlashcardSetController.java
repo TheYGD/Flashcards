@@ -21,8 +21,8 @@ public class FlashcardSetController {
     private FlashcardSetService flashcardSetService;
 
     @GetMapping("/{id}")
-    public String showById(@PathVariable("id") Long setId, Model model) {
-        FlashcardSetResponse flashcardSet = flashcardSetService.findResponseById(setId);
+    public String showById(@PathVariable("id") Long setId, Model model, @AuthenticationPrincipal User user) {
+        FlashcardSetResponse flashcardSet = flashcardSetService.showSetToUser(setId, user);
         model.addAttribute("set", flashcardSet);
 
         return "flashcard-set/show";

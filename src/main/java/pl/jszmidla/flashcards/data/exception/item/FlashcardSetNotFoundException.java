@@ -1,4 +1,6 @@
-package pl.jszmidla.flashcards.data.exception;
+package pl.jszmidla.flashcards.data.exception.item;
+
+import pl.jszmidla.flashcards.data.exception.item.ItemNotFoundException;
 
 public class FlashcardSetNotFoundException extends ItemNotFoundException {
 

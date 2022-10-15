@@ -1,4 +1,4 @@
-package pl.jszmidla.flashcards.data.exception;
+package pl.jszmidla.flashcards.data.exception.item;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

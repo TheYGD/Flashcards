@@ -12,6 +12,6 @@ public interface FlashcardSetRepository extends JpaRepository<FlashcardSet, Long
 
     FlashcardSet save(FlashcardSet flashcardSet);
     Optional<FlashcardSet> findById(Long id);
-    List<FlashcardSet> findAllByNameContaining(String query);
+    List<FlashcardSet> findAllByNameContainingIgnoreCase(String query);
     void removeById(Long id);
 }

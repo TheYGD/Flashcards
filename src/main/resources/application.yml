@@ -4,6 +4,9 @@ spring:
     username: postgres
     password: admin
     url: jdbc:postgresql://localhost:5432/flashcards
+  sql:
+    init:
+      mode: always
 
   jpa:
     hibernate:

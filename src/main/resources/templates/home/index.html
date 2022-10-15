@@ -4,6 +4,26 @@
 <body>
     <div class="container">
         <h1 class="mt-5">Index</h1>
+
+        <div th:if="${recentSetList != null}">
+            <hr class="mt-5"/>
+            <h3 class="mt-4">Recent sets</h3>
+
+            <h5 class="text-center mt-5" th:if="${recentSetList.size() == 0}">Here will be shown you recent seen sets.</h5>
+
+            <div class="d-flex px-0 mx-0" th:if="${recentSetList.size() != 0}">
+                <div class="d-inline-block mx-0 p-3 py-0" th:each="set : ${recentSetList}" style="width: 20% !important;">
+                    <div class="w-100 h-100">
+                        <a class="card ms-2 mt-4 text-decoration-none text-black hover-dark" style="height: 15rem;"
+                           th:href="${'/sets/' + set.id}">
+                            <h6 class="card-header py-3 bg-own-primary hover-light" th:text="${set.name}">Name</h6>
+                            <p class="p-3" th:text="${set.description}">Description</p>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 </body>
 </html>

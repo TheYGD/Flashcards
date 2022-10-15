@@ -34,11 +34,11 @@
 }
 
 .text-own-green {
-    color: rgb(100, 201, 179) !important;
+    color: rgb(95, 185, 147) !important;
 }
 
 .flashcard-scene {
-    perspective: 1500px;
+    perspective: 1000px;
 }
 
 .flashcard {
@@ -61,4 +61,12 @@
 }
 .flashcard-flipped {
     transform: rotateY(180deg);
+}
+
+.flashcard-to-be-removed-success {
+    transform: translateX(-100vw) !important;
+}
+
+.flashcard-to-be-removed-fail {
+    transform: translateX(100vw) !important;
 }
