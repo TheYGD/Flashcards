@@ -16,11 +16,7 @@ import pl.jszmidla.flashcards.repository.FlashcardRepository;
 import pl.jszmidla.flashcards.repository.FlashcardSetRepository;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -31,16 +27,13 @@ public class FlashcardSetService {
     private FlashcardRepository flashcardRepository;
     private FlashcardSetMapper flashcardSetMapper;
     private FlashcardMapper flashcardMapper;
-    private UsersActiveSetService usersActiveSetService;
-    private UsersRecentSetService usersRecentSetService;
 
 
     public FlashcardSet findById(Long id) {
         return flashcardSetRepository.findById(id).orElseThrow(FlashcardSetNotFoundException::new);
     }
-    public FlashcardSetResponse showSetToUser(Long id, User user) {
+    public FlashcardSetResponse showSetToUser(Long id) {
         FlashcardSet flashcardSet = findById(id);
-        usersRecentSetService.addRecentSetIfLogged(user, flashcardSet);
         return flashcardSetMapper.entityToResponse(flashcardSet);
     }
 
@@ -71,42 +64,12 @@ public class FlashcardSetService {
         return setResponseList;
     }
 
-    public RememberedAndUnrememberedFlashcardsSplitted getSplittedFlashcardsFromSet(Long id, User user) {
+    public List<FlashcardResponse> getAllFlashcardFromSet(Long id) {
         FlashcardSet flashcardSet = findById(id);
-        Set<Long> rememberedFlashcardsIds = usersActiveSetService.getRememberedFlashcardsIds(flashcardSet, user);
-
-        Map<Boolean, List<FlashcardResponse>> flashcardsSplittedMap = flashcardSet.getFlashcards().stream()
+        List<FlashcardResponse> flashcardResponses = flashcardSet.getFlashcards().stream()
                 .map(flashcardMapper::entityToResponse)
-                .collect(Collectors.groupingBy( flashcard -> rememberedFlashcardsIds.contains( flashcard.getId() ) ));
+                .toList();
 
-        RememberedAndUnrememberedFlashcardsSplitted flashcardsSplitted = new RememberedAndUnrememberedFlashcardsSplitted();
-        flashcardsSplitted.setRememberedFlashcardList( flashcardsSplittedMap.get(true) );
-        flashcardsSplitted.setUnrememberedFlashcardList( flashcardsSplittedMap.get(false) );
-
-        return flashcardsSplitted;
-    }
-
-    public void markFlashcardFromSetAsRemembered(long setId, long flashcardId, User user) {
-        FlashcardSet flashcardSet = findById(setId);
-        usersActiveSetService.markFlashcardAsRemembered(flashcardSet, flashcardId, user);
-    }
-
-    public void markSetAsCompleted(long setId, User user) {
-        FlashcardSet flashcardSet = findById(setId);
-        usersActiveSetService.markFlashcardAsCompleted(flashcardSet, user);
-    }
-
-    /**
-     * If user wants to run set sooner than it would reload itself
-     */
-    public void reloadSetSooner(long setId, User user) {
-        FlashcardSet flashcardSet = findById(setId);
-        usersActiveSetService.reloadSetSooner(flashcardSet, user);
-    }
-
-    public LocalDateTime getSetExpirationDate(Long setId, User user) {
-        FlashcardSet flashcardSet = findById(setId);
-        LocalDateTime expirationDate = usersActiveSetService.getSetExpirationDate(flashcardSet, user);
-        return expirationDate;
+        return flashcardResponses;
     }
 }

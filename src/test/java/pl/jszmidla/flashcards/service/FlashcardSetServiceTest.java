@@ -49,7 +49,7 @@ class FlashcardSetServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         flashcardSetService = new FlashcardSetService(flashcardSetRepository, flashcardRepository, flashcardSetMapper,
-                flashcardMapper, usersActiveSetService, usersRecentSetService);
+                flashcardMapper);
     }
 
 
@@ -133,7 +133,7 @@ class FlashcardSetServiceTest {
         FlashcardSet flashcardSet = createFlashcardSet(List.of());
         when( flashcardSetRepository.findById(any()) ).thenReturn(Optional.of(flashcardSet));
 
-        FlashcardSetResponse flashcardSetResponse = flashcardSetService.showSetToUser(1L, new User());
+        FlashcardSetResponse flashcardSetResponse = flashcardSetService.showSetToUser(1L);
 
         assertEquals(flashcardSet.getId(), flashcardSetResponse.getId());
         assertEquals(flashcardSet.getName(), flashcardSetResponse.getName());
@@ -156,65 +156,7 @@ class FlashcardSetServiceTest {
     }
 
     @Test
-    void getSplittedFlashcardsFromSet() {
-        Flashcard flashcard1 = createFlashcard(1, "fl1", "bc1"); // remembered
-        Flashcard flashcard2 = createFlashcard(2, "fl2", "bc2"); // unremembered
-        Set<Long> rememberedSet = Set.of(1L);
-        FlashcardSet flashcardSet = createFlashcardSet( List.of(flashcard1, flashcard2) );
-        when( flashcardSetRepository.findById(any()) ).thenReturn(Optional.of(flashcardSet));
-        when( usersActiveSetService.getRememberedFlashcardsIds(any(), any()) ).thenReturn(rememberedSet);
+    void getAllFlashcardFromSet() {
 
-        RememberedAndUnrememberedFlashcardsSplitted flashcardResponseSplitted =
-                flashcardSetService.getSplittedFlashcardsFromSet(1L, new User());
-
-
-        assertEquals(1, flashcardResponseSplitted.getRememberedFlashcardList().size());
-        assertEquals(1, flashcardResponseSplitted.getUnrememberedFlashcardList().size());
-        // remembered
-        FlashcardResponse rememberedFlashcard = flashcardResponseSplitted.getRememberedFlashcardList().get(0);
-        assertEquals( flashcardSet.getFlashcards().get(0).getId(), rememberedFlashcard.getId() );
-        assertEquals( flashcardSet.getFlashcards().get(0).getFront(), rememberedFlashcard.getFront() );
-        assertEquals( flashcardSet.getFlashcards().get(0).getBack(), rememberedFlashcard.getBack() );
-        // unremembered
-        FlashcardResponse unrememberedFlashcard = flashcardResponseSplitted.getUnrememberedFlashcardList().get(0);
-        assertEquals( flashcardSet.getFlashcards().get(1).getId(), unrememberedFlashcard.getId() );
-        assertEquals( flashcardSet.getFlashcards().get(1).getFront(), unrememberedFlashcard.getFront() );
-        assertEquals( flashcardSet.getFlashcards().get(1).getBack(), unrememberedFlashcard.getBack() );
-    }
-
-    @Test
-    void markFlashcardFromSetAsRemembered() {
-        long id = 2;
-        when( flashcardSetRepository.findById(any()) ).thenReturn( Optional.of(new FlashcardSet()) );
-
-        flashcardSetService.markFlashcardFromSetAsRemembered(id, id, new User());
-    }
-
-    @Test
-    void markSetAsCompleted() {
-        long id = 2;
-        when( flashcardSetRepository.findById(any()) ).thenReturn( Optional.of(new FlashcardSet()) );
-
-        flashcardSetService.markSetAsCompleted(id, new User());
-    }
-
-    private Flashcard createFlashcard(long id, String front, String back) {
-        Flashcard flashcard = new Flashcard();
-        flashcard.setId(id);
-        flashcard.setFront(front);
-        flashcard.setBack(back);
-        return flashcard;
-    }
-
-    @Test
-    void reloadSetSooner() {
-        long id = 2;
-        LocalDateTime date = LocalDateTime.now();
-        when( flashcardSetRepository.findById(any()) ).thenReturn( Optional.of(new FlashcardSet()) );
-        when( usersActiveSetService.getSetExpirationDate(any(), any()) ).thenReturn( date );
-
-        LocalDateTime actualDate = flashcardSetService.getSetExpirationDate(id, new User());
-
-        assertEquals(date, actualDate);
     }
 }

@@ -1,268 +1,36 @@
 <!DOCTYPE html>
-<html lang="en" th:replace="fragments/layout :: layout(body=~{::body}, title='set-name', script=~{::script})">
+<html lang="en" th:replace="fragments/layout :: layout(body=~{::body}, title=${set.name})">
 
 <body>
-  <div class="container-fluid" style="overflow-x: clip">
-      <div class="container">
-          <h1 class="mt-5" th:text="${set.name}">Set name</h1>
-          <p>
-              Author:
-              <a class="text-own-green text-decoration-none" th:href="@{__${'/profiles/' + set.authorId}__}"
-                 th:text="${' ' + set.authorName}">Username</a>
-          </p>
-          <p th:text="${set.description}">Description</p>
-          <hr/>
+    <div class="container">
+        <h1 class="mt-5" th:text="${set.name}">Set name</h1>
+        <p>
+            Author:
+            <a class="text-own-green text-decoration-none" th:href="@{__${'/profiles/' + set.authorId}__}"
+               th:text="${' ' + set.authorName}">Username</a>
+        </p>
+        <p th:text="${set.description}">Description</p>
 
-          <div class="flashcard-scene row justify-content-center mt-5"></div>
-      </div>
-  </div>
+        <a th:href="@{__(${'/sets/learn/' + set.id})__}" class="btn btn-own-primary my-3">Start learning</a>
+
+        <hr class="mb-0"/>
+        <div class="row justify-content-around">
+            <div th:each="card : ${flashcards}" class="col-6 row px-4">
+                <div class="row rounded-2 border border-2 p-0 m-0 mt-4" style="border-color: rgb(101, 203, 178) !important;">
+                    <div class="card col me-0" style="height: 12rem;">
+                        <p class="form-control h-100 my-3 p-3" th:text="${card.front}"></p>
+                    </div>
+                    <div class="card col ms-0" style="height: 12rem;">
+                        <p class="form-control h-100 my-3 p-3" th:text="${card.back}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${flashcards.size() % 2 != 0}" class="col-6 row px-4"></div>
+        </div>
+
+        <div class="flashcard-scene row justify-content-center mt-5"></div>
+    </div>
 </body>
-
-
-<script th:inline="javascript">
-    let COMPLETED_TEXT = 'Congratulations! You have finished this set';
-    let RELOAD_SET_TEXT_ARR = ['It will be automatically reloaded on ', ', or reload it manually.'];
-    let setId = /*[[${set.id}]]*/ '';
-    let flashcardList = [];
-    let rememberedFlashcardList = [];
-
-    init();
-    async function init() {
-        await loadFlashcardsFromTheServer();
-        initCard();
-    }
-
-
-    async function loadFlashcardsFromTheServer() {
-        let url = location.origin + `/api/v1/flashcard-sets/${setId}`;
-
-        await fetch(url)
-            .then(res => {
-                return res.json();
-            })
-            .then(res => {
-                rememberedFlashcardList = res.rememberedFlashcardList || [];
-                flashcardList = res.unrememberedFlashcardList || [];
-            });
-    }
-
-    function initCard() {
-        if (flashcardList.length != 0)
-            createNextCard();
-
-        else
-            showFinishScreen();
-    }
-
-    function makeFlashcardClickable(flashcardEl) {
-        flashcardEl.onclick = function() {
-            flashcardEl.classList.toggle('flashcard-flipped');
-        }
-    }
-
-    function setTextOnFlashcard(flashcardEl, flashcardObj) {
-        let frontText = flashcardObj.front;
-        let front = flashcardEl.children[0].children[0].children[0];
-        front.innerHTML = frontText;
-
-        let backText = flashcardObj.back;
-        let back = flashcardEl.children[1].children[0].children[0];
-        back.innerHTML = backText;
-    }
-
-    async function markFlashcardAsSuccess(flashcard) {
-        await markFlashcardAsRememberedOnServer(flashcard.id);
-        rememberedFlashcardList.push(flashcard);
-    }
-
-    function markFlashcardAsFail(flashcard) {
-        flashcardList.push(flashcard);
-    }
-
-    function setFlashcardButtonsWithId(flashcardEl, flashcardObj) {
-        let successBtn = flashcardEl.children[1].children[1].children[0];
-        let failBtn = flashcardEl.children[1].children[1].children[1];
-
-        successBtn.onclick = async (o) => {
-            await markFlashcardAsSuccess(flashcardObj);
-            o.stopPropagation();
-            flashcardEl.classList.add('flashcard-to-be-removed-success');
-            deleteCurrentFlashcardAndShowNewOrFinish(flashcardEl, successBtn, failBtn);
-        }
-
-        failBtn.onclick = async (o) => {
-            await markFlashcardAsFail(flashcardObj);
-            o.stopPropagation();
-            flashcardEl.classList.add('flashcard-to-be-removed-fail');
-            deleteCurrentFlashcardAndShowNewOrFinish(flashcardEl, successBtn, failBtn);
-        }
-    }
-
-    function createNextCard() {
-        let flashcardObj = flashcardList.shift();
-
-        let flashcardSceneEl = $('.flashcard-scene')[0];
-        let flashcardEl = createFlashcardElement();
-
-        setTextOnFlashcard(flashcardEl, flashcardObj);
-        flashcardSceneEl.appendChild(flashcardEl);
-        makeFlashcardClickable(flashcardEl);
-        setFlashcardButtonsWithId(flashcardEl, flashcardObj);
-    }
-
-    function createFlashcardElement() {
-        let flashcardEl = createFlashcard();
-        let frontEl = createFront();
-        let backEl = createBack();
-
-        flashcardEl.appendChild(frontEl);
-        flashcardEl.appendChild(backEl);
-
-        return flashcardEl;
-
-        function createFlashcard() {
-            let flashcardEl = document.createElement('div');
-            flashcardEl.className = 'flashcard position-absolute border border-2 rounded-1 shadow-sm p-3 mt-5';
-            flashcardEl.style.width = '25rem';
-            flashcardEl.style.height = '30rem';
-
-            return flashcardEl;
-        }
-        function createFront() {
-            let frontEl = document.createElement('div');
-            frontEl.className = 'flashcard-side pb-4';
-            let frontChildEl = document.createElement('div');
-            frontChildEl.className = 'd-flex align-items-center justify-content-center pb-3';
-            frontChildEl.style.height = '75%';
-            let frontTextEl = document.createElement('h3');
-            frontTextEl.className = 'text-center';
-
-            frontEl.appendChild(frontChildEl);
-            frontChildEl.appendChild(frontTextEl);
-
-            return frontEl;
-        }
-        function createBack() {
-            let backEl = document.createElement('div');
-            backEl.className = 'flashcard-side flashcard-back pb-4';
-            let backChild1El = document.createElement('div');
-            backChild1El.className = 'd-flex align-items-center justify-content-center pb-3';
-            backChild1El.style.height = '75%';
-            let backTextEl = document.createElement('h3');
-            backTextEl.className = 'text-center';
-            let backChild2El = document.createElement('div');
-            backChild2El.className = 'row';
-            backChild2El.style.height = '25%';
-            let successDiv = document.createElement('div');
-            successDiv.className = 'col-4 offset-2 d-flex align-items-center justify-content-center';
-            let successBtn = document.createElement('button')
-            successBtn.className = 'btn border border-2 border-success opacity-75 btn-outline-success fa fa-check ' +
-                'rounded-circle z-index-1';
-            successBtn.style.height = '4rem';
-            successBtn.style.width = '4rem';
-            successBtn.type = 'button';
-            successBtn.id = 'success-btn'
-            let failDiv = document.createElement('div');
-            failDiv.className = 'col-4 offset-2 d-flex align-items-center justify-content-center';
-            let failBtn = document.createElement('button')
-            failBtn.className = 'btn border border-2 border-danger opacity-75 btn-outline-danger fa fa-x ' +
-                'rounded-circle z-index-1';
-            failBtn.style.height = '4rem';
-            failBtn.style.width = '4rem';
-            failBtn.type = 'button';
-            failBtn.id = 'fail-btn'
-
-            backEl.appendChild(backChild1El)
-            backEl.appendChild(backChild2El)
-            backChild1El.appendChild(backTextEl);
-            backChild2El.appendChild(successDiv);
-            backChild2El.appendChild(failDiv);
-            successDiv.appendChild(successBtn);
-            failDiv.appendChild(failBtn);
-
-            return backEl;
-        }
-    }
-
-    async function markFlashcardAsRememberedOnServer(flashcardId) {
-        let url = location.origin + `/api/v1/flashcard-sets/${setId}/remembered/${flashcardId}`;
-        await fetch(url, {
-            method: 'POST'
-        });
-    }
-
-    function deleteCurrentFlashcardAndShowNewOrFinish(flashcardEl, successBtn, failBtn) {
-        successBtn.onclick = null;
-        failBtn.onclick = null;
-
-        if (flashcardList.length == 0) {
-            completeSetOnServer();
-            setTimeout(showFinishScreen, 500);
-            return;
-        }
-        setTimeout(createNextCard, 0);
-        setTimeout(() => flashcardEl.remove(), 1500)
-    }
-
-    async function showFinishScreen() {
-        let flashcardSceneEl = $('.flashcard-scene')[0];
-
-        let finishDiv = document.createElement('div');
-        finishDiv.className = 'd-flex flex-column';
-
-        let finishText = document.createElement('h3');
-        finishText.innerHTML = COMPLETED_TEXT;
-        finishText.className = 'text-center text-own-green mt-4';
-
-        let reloadDate = await getSetExpirationDate();
-        let reloadSetText = document.createElement('h5');
-        reloadSetText.innerHTML = RELOAD_SET_TEXT_ARR[0] + reloadDate + RELOAD_SET_TEXT_ARR[1];
-        reloadSetText.className = 'text-center mt-3 mx-auto';
-
-        let reloadSetBtn = document.createElement('button');
-        reloadSetBtn.className = 'btn btn-outline-success opacity-75 mt-3 mx-auto';
-        reloadSetBtn.type = 'button';
-        reloadSetBtn.innerHTML = 'Reload set';
-        reloadSetBtn.onclick = reloadSet;
-
-        finishDiv.appendChild(finishText);
-        finishDiv.appendChild(reloadSetText);
-        finishDiv.appendChild(reloadSetBtn);
-
-        flashcardSceneEl.appendChild(finishDiv);
-    }
-
-    function reloadSet() {
-        let url = location.origin + `/api/v1/flashcard-sets/${setId}/reload`;
-        fetch(url, {
-            method: 'POST'
-        })
-        .then(res => {
-            if (res.status == 200) {
-                location.reload();
-            }
-        });
-    }
-
-    async function getSetExpirationDate() {
-        let url = location.origin + `/api/v1/flashcard-sets/${setId}/expire`;
-
-        let fetchResult = await fetch(url, {
-                method: 'GET'
-            });
-        let result = await fetchResult.json();
-
-        let date = new Date(result);
-        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-    }
-
-    function completeSetOnServer() {
-        let url = location.origin + `/api/v1/flashcard-sets/${setId}/completed`;
-        fetch(url, {
-            method: 'POST'
-        });
-    }
-
-</script>
 
 </html>

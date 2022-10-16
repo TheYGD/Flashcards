@@ -6,8 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.jszmidla.flashcards.data.User;
+import pl.jszmidla.flashcards.data.dto.FlashcardResponse;
 import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
 import pl.jszmidla.flashcards.data.dto.FlashcardSetResponse;
+import pl.jszmidla.flashcards.data.dto.RememberedAndUnrememberedFlashcardsSplitted;
 import pl.jszmidla.flashcards.service.FlashcardSetService;
 
 import javax.validation.Valid;
@@ -21,11 +23,22 @@ public class FlashcardSetController {
     private FlashcardSetService flashcardSetService;
 
     @GetMapping("/{id}")
-    public String showById(@PathVariable("id") Long setId, Model model, @AuthenticationPrincipal User user) {
-        FlashcardSetResponse flashcardSet = flashcardSetService.showSetToUser(setId, user);
+    public String showSet(@PathVariable("id") Long setId, Model model, @AuthenticationPrincipal User user) {
+        FlashcardSetResponse flashcardSet = flashcardSetService.showSetToUser(setId);
+        List<FlashcardResponse> flashcards = flashcardSetService.getAllFlashcardFromSet(setId);
+
         model.addAttribute("set", flashcardSet);
+        model.addAttribute("flashcards", flashcards);
 
         return "flashcard-set/show";
+    }
+
+    @GetMapping("/learn/{id}")
+    public String learnSet(@PathVariable("id") Long setId, Model model) {
+        FlashcardSetResponse flashcardSet = flashcardSetService.showSetToUser(setId);
+        model.addAttribute("set", flashcardSet);
+
+        return "flashcard-set/learn";
     }
 
     @GetMapping("/search")

@@ -25,12 +25,13 @@
 }
 
 .btn-own-primary {
-    background: linear-gradient(90deg, rgb(88, 194, 160) 21%, rgb(100, 201, 179) 50%, rgb(122, 217, 199) 100%) !important;
+    background: linear-gradient(90deg, rgb(88, 194, 153) 21%, rgb(100, 201, 162) 50%, rgb(122, 217, 189) 100%) !important;
     color: white !important;
+
 }
 
 .btn-own-primary:hover {
-    background: linear-gradient(90deg, rgb(122, 203, 176) 21%, rgb(115, 204, 185) 50%, rgb(143, 210, 198) 100%) !important;
+    background: linear-gradient(90deg, rgb(111, 208, 174) 21%, rgb(122, 211, 180) 50%, rgb(133, 213, 192) 100%) !important;
 }
 
 .text-own-green {

@@ -22,6 +22,7 @@ public class SecurityConfig {
             .authorizeRequests()
                 .mvcMatchers("/sets/create").authenticated()
                 .mvcMatchers("/sets/delete/*").authenticated()
+                .mvcMatchers("/sets/learn/*").authenticated()
 
                 .mvcMatchers("/").permitAll()
                 .mvcMatchers("/register").permitAll()

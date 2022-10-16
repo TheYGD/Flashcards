@@ -92,7 +92,7 @@ class UsersRecentSetServiceTest {
         usersRecentSetService.addRecentSetIfLogged(new User(), new FlashcardSet());
 
         verify( flashcardSetList ).size();
-        verify( flashcardSetList ).remove(0);
+        verify( flashcardSetList ).remove(4);
     }
 
     @Test

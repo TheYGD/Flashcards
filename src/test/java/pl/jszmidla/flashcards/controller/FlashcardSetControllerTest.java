@@ -41,7 +41,7 @@ class FlashcardSetControllerTest {
     }
 
     @Test
-    void showById() throws Exception {
+    void showSet() throws Exception {
         long id = 1L;
         mockMvc.perform( get("/sets/" + id) )
                 .andExpect( view().name("flashcard-set/show") );
@@ -120,5 +120,10 @@ class FlashcardSetControllerTest {
         long id = 1;
         mockMvc.perform(delete("/sets/delete/" + id))
                 .andExpect( view().name("redirect:/profile/sets") );
+    }
+
+    @Test
+    void learnSet() {
+
     }
 }

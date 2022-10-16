@@ -1,18 +1,25 @@
 package pl.jszmidla.flashcards.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.jszmidla.flashcards.data.Flashcard;
 import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.User;
 import pl.jszmidla.flashcards.data.UsersActiveSet;
+import pl.jszmidla.flashcards.data.dto.FlashcardResponse;
+import pl.jszmidla.flashcards.data.dto.RememberedAndUnrememberedFlashcardsSplitted;
 import pl.jszmidla.flashcards.data.exception.item.UsersActiveSetNotFoundException;
+import pl.jszmidla.flashcards.data.mapper.FlashcardMapper;
 import pl.jszmidla.flashcards.repository.UsersActiveSetRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,18 +27,29 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class UsersActiveSetServiceTest {
 
     @Mock
     UsersActiveSetRepository usersActiveSetRepository;
-    @InjectMocks
+    @Mock
+    FlashcardSetService flashcardSetService;
+    @Mock
+    UsersRecentSetService usersRecentSetService;
+    FlashcardMapper flashcardMapper = new FlashcardMapper();
     UsersActiveSetService usersActiveSetService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        usersActiveSetService = new UsersActiveSetService(usersActiveSetRepository, flashcardSetService,
+                usersRecentSetService, flashcardMapper);
+    }
+
 
     @Test
     void getUsersActiveSet() {
         String csv = "1,2";
-        UsersActiveSet usersActiveSet = createUsersActiveSet(csv);
+        UsersActiveSet usersActiveSet = createUsersActiveSet(csv, new FlashcardSet());
         when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
 
         UsersActiveSet actualUsersActiveSet = usersActiveSetService.getUsersActiveSet(new FlashcardSet(), new User());
@@ -41,7 +59,7 @@ class UsersActiveSetServiceTest {
     @Test
     void getOrCreateUsersActiveSetGet() {
         String csv = "1,2";
-        UsersActiveSet usersActiveSet = createUsersActiveSet(csv);
+        UsersActiveSet usersActiveSet = createUsersActiveSet(csv, new FlashcardSet());
         when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
 
         UsersActiveSet actualUsersActiveSet = usersActiveSetService.getOrCreateUsersActiveSet(new FlashcardSet(), new User());
@@ -66,7 +84,7 @@ class UsersActiveSetServiceTest {
         String id1 = "1";
         String id2 = "2";
         String givenCsv = id1 + "," + id2;
-        UsersActiveSet usersActiveSet = createUsersActiveSet(givenCsv);
+        UsersActiveSet usersActiveSet = createUsersActiveSet(givenCsv, new FlashcardSet());
         when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
 
         Set<Long> valuesFromCsv = usersActiveSetService.getRememberedFlashcardsIds(any(), any());
@@ -82,7 +100,7 @@ class UsersActiveSetServiceTest {
         FlashcardSet flashcardSet = new FlashcardSet();
         when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
 
-        usersActiveSetService.markFlashcardAsRemembered(flashcardSet, flashcardId, new User());
+        usersActiveSetService.markFlashcardAsRemembered(flashcardId, flashcardId, new User());
 
         verify( usersActiveSet ).addFlashcardToRemembered(flashcardId);
         verify( usersActiveSetRepository ).save(usersActiveSet);
@@ -90,11 +108,12 @@ class UsersActiveSetServiceTest {
 
     @Test
     void markFlashcardAsCompleted() {
+        long flashcardId = 2L;
         UsersActiveSet usersActiveSet = spy( UsersActiveSet.class );
         FlashcardSet flashcardSet = new FlashcardSet();
         when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
 
-        usersActiveSetService.markFlashcardAsCompleted(flashcardSet, new User());
+        usersActiveSetService.markSetAsCompleted(flashcardId, new User());
 
         verify( usersActiveSet ).incrementExpirationInterval();
         verify( usersActiveSetRepository ).save(usersActiveSet);
@@ -103,20 +122,79 @@ class UsersActiveSetServiceTest {
     @Test
     void reloadSetSooner() {
         UsersActiveSet usersActiveSet = spy( UsersActiveSet.class );
-        FlashcardSet flashcardSet = new FlashcardSet();
         when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
+        when( flashcardSetService.findById(any()) ).thenReturn(new FlashcardSet());
 
-        usersActiveSetService.reloadSetSooner(flashcardSet, new User());
+        usersActiveSetService.reloadSetSooner(1L, new User());
 
         verify( usersActiveSet ).adjustExpirationDate();
-        verify( usersActiveSet ).setRememberedFlashcardsCSV("");
+        verify( usersActiveSet ).clearRememberedFlashcards();
         verify( usersActiveSetRepository ).save(usersActiveSet);
     }
 
-    UsersActiveSet createUsersActiveSet(String csv) {
+    UsersActiveSet createUsersActiveSet(String csv, FlashcardSet flashcardSet) {
         UsersActiveSet usersActiveSet = new UsersActiveSet();
         usersActiveSet.setRememberedFlashcardsCSV(csv);
         usersActiveSet.setExpirationDate(LocalDateTime.now().plusDays(1));
+        usersActiveSet.setFlashcardSet(flashcardSet);
         return usersActiveSet;
+    }
+
+    @Test
+    void getSetExpirationDate() {
+        LocalDateTime date = LocalDateTime.now();
+        UsersActiveSet usersActiveSet = new UsersActiveSet();
+        usersActiveSet.setExpirationDate(date);
+        when( flashcardSetService.findById( any()) ).thenReturn( new FlashcardSet() );
+        when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
+
+        LocalDateTime actualDate = usersActiveSetService.getSetExpirationDate(anyLong(), new User());
+
+        assertEquals(date, actualDate);
+    }
+
+    @Test
+    void showSplittedFlashcardsFromSet() {
+        Flashcard flashcard1 = createFlashcard(1, "fl1", "bc1"); // remembered
+        Flashcard flashcard2 = createFlashcard(2, "fl2", "bc2"); // unremembered
+        String rememberedCSV = "1,";
+        FlashcardSet flashcardSet = createFlashcardSet( List.of(flashcard1, flashcard2) );
+        UsersActiveSet usersActiveSet = createUsersActiveSet(rememberedCSV, flashcardSet);
+        when( flashcardSetService.findById(any()) ).thenReturn(flashcardSet);
+        when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
+
+        RememberedAndUnrememberedFlashcardsSplitted flashcardResponseSplitted =
+                usersActiveSetService.showSplittedFlashcardsToUser(1L, new User());
+
+
+        assertEquals(1, flashcardResponseSplitted.getRememberedFlashcardList().size());
+        assertEquals(1, flashcardResponseSplitted.getUnrememberedFlashcardList().size());
+        // remembered
+        FlashcardResponse rememberedFlashcard = flashcardResponseSplitted.getRememberedFlashcardList().get(0);
+        assertEquals( flashcardSet.getFlashcards().get(0).getId(), rememberedFlashcard.getId() );
+        assertEquals( flashcardSet.getFlashcards().get(0).getFront(), rememberedFlashcard.getFront() );
+        assertEquals( flashcardSet.getFlashcards().get(0).getBack(), rememberedFlashcard.getBack() );
+        // unremembered
+        FlashcardResponse unrememberedFlashcard = flashcardResponseSplitted.getUnrememberedFlashcardList().get(0);
+        assertEquals( flashcardSet.getFlashcards().get(1).getId(), unrememberedFlashcard.getId() );
+        assertEquals( flashcardSet.getFlashcards().get(1).getFront(), unrememberedFlashcard.getFront() );
+        assertEquals( flashcardSet.getFlashcards().get(1).getBack(), unrememberedFlashcard.getBack() );
+    }
+
+    private FlashcardSet createFlashcardSet(List<Flashcard> flashcardList) {
+        FlashcardSet flashcardSet = new FlashcardSet();
+        flashcardSet.setName("name");
+        flashcardSet.setDescription("desc");
+        flashcardSet.setFlashcards(flashcardList);
+
+        return flashcardSet;
+    }
+
+    private Flashcard createFlashcard(long id, String front, String back) {
+        Flashcard flashcard = new Flashcard();
+        flashcard.setId(id);
+        flashcard.setFront(front);
+        flashcard.setBack(back);
+        return flashcard;
     }
 }
