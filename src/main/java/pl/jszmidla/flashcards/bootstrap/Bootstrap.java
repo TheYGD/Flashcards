@@ -1,17 +1,14 @@
 package pl.jszmidla.flashcards.bootstrap;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import pl.jszmidla.flashcards.data.Flashcard;
 import pl.jszmidla.flashcards.data.FlashcardSet;
-import pl.jszmidla.flashcards.data.Role;
 import pl.jszmidla.flashcards.data.User;
-import pl.jszmidla.flashcards.data.dto.RegisterUserRequest;
+import pl.jszmidla.flashcards.data.dto.account.RegisterUserRequest;
 import pl.jszmidla.flashcards.repository.*;
-import pl.jszmidla.flashcards.service.RegisterService;
+import pl.jszmidla.flashcards.service.UserService;
 
 import javax.transaction.Transactional;
 import java.util.LinkedList;
@@ -27,14 +24,16 @@ public class Bootstrap implements CommandLineRunner {
     private FlashcardRepository flashcardRepository;
     private FlashcardSetRepository flashcardSetRepository;
     private UserRepository userRepository;
-    private RegisterService registerService;
+    private UserService registerService;
 
     private static String USER_LOGIN = "LOGIN123";
     private static String USER_PASSWORD = "Haslo123";
     private static String USER_EMAIL = "email@user.pl";
+    private static String USER_BIO = "I'm LOGIN123, I'm first user of this application :)";
     private static String AUTHOR_LOGIN = "tommy172";
     private static String AUTHOR_PASSWORD = "Haslo123";
     private static String AUTHOR_EMAIL = "abb@baa.com";
+    private static String AUTHOR_BIO = "Have a look at my sets, they might help you to widen your knowledge. Good luck!";
 
 
     @Override
@@ -44,7 +43,9 @@ public class Bootstrap implements CommandLineRunner {
         }
 
         createUser(USER_LOGIN, USER_PASSWORD, USER_EMAIL);
+        setUsersBio(USER_LOGIN, USER_BIO);
         createUser(AUTHOR_LOGIN, AUTHOR_PASSWORD, AUTHOR_EMAIL);
+        setUsersBio(AUTHOR_LOGIN, AUTHOR_BIO);
         createFlashcardSets();
     }
 
@@ -122,5 +123,12 @@ public class Bootstrap implements CommandLineRunner {
         flashcardSet.setFlashcards(flashcardList);
 
         return flashcardSet;
+    }
+
+    private void setUsersBio(String username, String bio) {
+        User user = userRepository.findByUsernameOrEmail(username, "")
+                .orElseThrow();
+        user.setBio(bio);
+        userRepository.save(user);
     }
 }

@@ -2,8 +2,8 @@ package pl.jszmidla.flashcards.data.mapper;
 
 import org.junit.jupiter.api.Test;
 import pl.jszmidla.flashcards.data.Flashcard;
-import pl.jszmidla.flashcards.data.dto.FlashcardRequest;
-import pl.jszmidla.flashcards.data.dto.FlashcardResponse;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardRequest;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
 

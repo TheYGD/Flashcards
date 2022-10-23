@@ -2,8 +2,8 @@ package pl.jszmidla.flashcards.data.mapper;
 
 import org.springframework.stereotype.Component;
 import pl.jszmidla.flashcards.data.Flashcard;
-import pl.jszmidla.flashcards.data.dto.FlashcardRequest;
-import pl.jszmidla.flashcards.data.dto.FlashcardResponse;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardRequest;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardResponse;
 
 @Component
 public class FlashcardMapper {

@@ -50,6 +50,13 @@
     transform-style: preserve-3d;
 }
 
+.remove-card-btn {
+    position: relative;
+    top: 2.4rem;
+    right: 0.1rem;
+    z-index: 1;
+}
+
 .flashcard-side {
     position: absolute;
     height: 100%;
@@ -70,4 +77,50 @@
 
 .flashcard-to-be-removed-fail {
     transform: translateX(100vw) !important;
+}
+
+
+.flashcard-active-not-completed:after, .flashcard-completed-wait:after, .flashcard-completed-ready:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 4rem;
+    width: 4rem;
+    background-size:contain;
+}
+
+.flashcard-active-not-completed:before, .flashcard-completed-wait:before, .flashcard-completed-ready:before {
+    position: absolute;
+    height: 4rem;
+    width: 4rem;
+    top: 2px;
+    right: 2px;
+    z-index: 1;
+    text-align: center;
+    font-size: 0.8rem;
+    rotate: 45deg;
+}
+
+.flashcard-active-not-completed:after {
+    background-image: url("/img/badge-3.png");
+}
+.flashcard-active-not-completed:before {
+    color: white;
+    content: "ACTIVE";
+}
+
+.flashcard-completed-wait:after {
+    background-image: url("/img/badge-1.png");
+}
+.flashcard-completed-wait:before {
+    color: white;
+    content: "WAIT";
+}
+
+.flashcard-completed-ready:after {
+    background-image: url("/img/badge-2.png");
+}
+.flashcard-completed-ready:before {
+    content: "READY";
 }

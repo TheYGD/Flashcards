@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import pl.jszmidla.flashcards.data.User;
-import pl.jszmidla.flashcards.data.dto.ChangePasswordRequest;
+import pl.jszmidla.flashcards.data.dto.account.ChangePasswordRequest;
 import pl.jszmidla.flashcards.repository.UserRepository;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.User;
-import pl.jszmidla.flashcards.data.dto.FlashcardSetResponse;
-import pl.jszmidla.flashcards.data.mapper.FlashcardSetMapper;
+import pl.jszmidla.flashcards.data.UsersActiveSet;
+import pl.jszmidla.flashcards.data.dto.flashcard.ActiveFlashcardSetResponse;
+import pl.jszmidla.flashcards.data.mapper.ActiveSetMapper;
 
 import java.util.List;
 
@@ -14,18 +15,20 @@ import java.util.List;
 public class HomeService {
 
     private UsersRecentSetService usersRecentSetService;
-    private FlashcardSetMapper flashcardSetMapper;
+    private UsersActiveSetService usersActiveSetService;
+    private ActiveSetMapper activeSetMapper;
 
 
-    public List<FlashcardSetResponse> getUsersRecentSets(User user) {
+    public List<ActiveFlashcardSetResponse> getUsersRecentSets(User user) {
         List<FlashcardSet> recentSetList = usersRecentSetService.getUsersRecentSetListOrNull(user);
-
         if (recentSetList == null) {
             return null;
         }
 
-        return recentSetList.stream()
-                .map(flashcardSetMapper::entityToResponse)
+        List<UsersActiveSet> activeSetList = usersActiveSetService.getActiveSetsOutOfSets(user, recentSetList);
+
+        return activeSetList.stream()
+                .map(activeSetMapper::entityToResponse)
                 .toList();
     }
 

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.jszmidla.flashcards.data.User;
-import pl.jszmidla.flashcards.data.dto.RememberedAndUnrememberedFlashcardsSplitted;
+import pl.jszmidla.flashcards.data.dto.flashcard.RememberedAndUnrememberedFlashcardsSplitted;
 import pl.jszmidla.flashcards.service.UsersActiveSetService;
 
 import java.time.LocalDateTime;
@@ -27,7 +27,7 @@ public class UsersActiveSetApi {
 
     @GetMapping(value = "/{setId}/expire")
     public LocalDateTime getSetExpirationDate(@PathVariable Long setId, @AuthenticationPrincipal User user) {
-        LocalDateTime expirationDate = usersActiveSetService.getSetExpirationDate(setId, user);
+        LocalDateTime expirationDate = usersActiveSetService.getSetReloadDate(setId, user);
         return expirationDate;
     }
 
@@ -41,12 +41,6 @@ public class UsersActiveSetApi {
     public String markFlashcardFromSetAsRemembered(@PathVariable Long setId, @PathVariable Long flashcardId,
                                                    @AuthenticationPrincipal User user) {
         usersActiveSetService.markFlashcardAsRemembered(setId, flashcardId, user);
-        return "Success";
-    }
-
-    @PostMapping("/{setId}/completed")
-    public String markSetAsCompleted(@PathVariable Long setId, @AuthenticationPrincipal User user) {
-        usersActiveSetService.markSetAsCompleted(setId, user);
         return "Success";
     }
 }

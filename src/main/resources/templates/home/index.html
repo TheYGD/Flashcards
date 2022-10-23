@@ -4,11 +4,10 @@
 <body>
     <div class="container">
         <h1 class="mt-5">Index</h1>
+        <hr/>
 
         <div th:if="${recentSetList != null}">
-            <hr class="mt-5"/>
-            <h3 class="mt-4">Recent sets</h3>
-
+            <h3 class="mt-5">Recent sets</h3>
             <h5 class="text-center mt-5" th:if="${recentSetList.size() == 0}">Here will be shown you recent seen sets.</h5>
 
             <div class="d-flex px-0 mx-0" th:if="${recentSetList.size() != 0}">
@@ -16,12 +15,12 @@
                     <div class="w-100 h-100">
                         <a class="card ms-2 mt-4 text-decoration-none text-black hover-dark" style="height: 15rem;"
                            th:href="${'/sets/' + set.id}">
+                            <div class="h-100 w-100 position-absolute" th:classappend="${set.cssClass}" ></div>
                             <h6 class="card-header py-3 bg-own-primary hover-light" th:text="${set.name}">Name</h6>
                             <p class="p-3" th:text="${set.description}">Description</p>
                         </a>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

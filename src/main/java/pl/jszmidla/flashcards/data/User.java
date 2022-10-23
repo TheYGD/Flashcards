@@ -22,6 +22,7 @@ public class User extends BaseEntity implements UserDetails {
     private String email;
     private String username;
     private String password;
+    private String bio;
 
     @Enumerated(EnumType.STRING)
     private Role role;

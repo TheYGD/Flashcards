@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import pl.jszmidla.flashcards.data.User;
-import pl.jszmidla.flashcards.data.dto.RegisterUserRequest;
+import pl.jszmidla.flashcards.data.dto.account.RegisterUserRequest;
 
 @Component
 @AllArgsConstructor

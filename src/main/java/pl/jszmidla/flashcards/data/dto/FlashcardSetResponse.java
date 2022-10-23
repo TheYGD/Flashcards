@@ -1,4 +1,4 @@
-package pl.jszmidla.flashcards.data.dto;
+package pl.jszmidla.flashcards.data.dto.flashcard;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,5 +12,6 @@ public class FlashcardSetResponse {
     private String authorName;
     private String name;
     private String description;
+    private Integer flashcardCount;
 }
 

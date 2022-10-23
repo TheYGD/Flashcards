@@ -8,17 +8,19 @@
     <form action="post" id="create-set-form" th:action="@{/sets/create}">
       <div class="form-group mt-3">
         <label class="form-label" for="name">Name</label>
-        <input class="form-control" type="text" id="name" name="name">
+        <input class="form-control" type="text" id="name" name="name" th:value="${set != null ? set.name : ''}">
       </div>
 
       <div class="form-group mt-3">
         <label class="form-label" for="description">Description</label>
-        <input class="form-control" type="text" id="description" name="description">
+        <input class="form-control" type="text" id="description" name="description"
+               th:value="${set != null ? set.description : ''}">
       </div>
 
       <h2 class="mt-5">Flashcards</h2>
       <div class="row ms-4 ps-2" id="flashcard-list">
-        <div class="col-6 row px-4">
+        <!--    Card in new set    -->
+        <div class="col-6 row px-4" th:if="${set == null}">
           <div class="mt-1 d-flex flex-row-reverse">
             <button type="button" class="btn btn-sm btn-dark fa fa-x remove-card-btn"></button>
           </div>
@@ -38,6 +40,30 @@
           </div>
         </div>
 
+        <!--    Cards from edited set    -->
+        <th:block th:if="${set != null}">
+          <div class="col-6 row px-4 flashcard-in-set" th:each="flashcard : ${set.flashcardList}"
+               th:id="${'flashcard-' + flashcard.id}" unchanged>
+            <div class="mt-1 d-flex flex-row-reverse">
+              <button type="button" class="btn btn-sm btn-dark fa fa-x remove-card-btn"></button>
+            </div>
+            <div class="row rounded-2 border border-2 p-0 m-0" style="border-color: rgb(101, 203, 178) !important;">
+              <div class="card col me-0" style="height: 15rem;">
+                <label class="h-100 mt-3 mx-2">
+                  Front
+                  <textarea class="form-control h-75 mt-2" name="back" th:text="${flashcard.front}"></textarea>
+                </label>
+              </div>
+              <div class="card col ms-0" style="height: 15rem;">
+                <label class="h-100 mt-3 mx-2">
+                  Back
+                  <textarea class="form-control h-75 mt-2" name="back" th:text="${flashcard.back}"></textarea>
+                </label>
+              </div>
+            </div>
+          </div>
+        </th:block>
+
         <div class="col-3 row mt-4 pt-2">
           <div class="col-8 offset-2 d-flex justify-content-center align-items-center" style="height: 15rem;">
             <div class="">
@@ -50,45 +76,52 @@
         </div>
       </div>
 
-      <div class="row mt-5">
-        <button class="btn col-4 offset-4 btn-own-primary" style="height: 4rem;" type="button" id="submit-btn">
+      <div class="row mt-5 pt-3 justify-content-center">
+        <button th:classappend="${set != null ? 'col-3' : 'col-4'}" class="btn btn-own-primary mx-5" style="height: 4rem;"
+                type="button" id="submit-btn">
           Create
+        </button>
+        <button th:if="${set != null}" class="btn col-3 btn-danger mx-5" style="height: 4rem; opacity: 90%;" type="button"
+                id="delete-set-btn">
+          Delete
         </button>
       </div>
     </form>
   </div>
-
-  <style>
-    .remove-card-btn {
-      position: relative;
-      top: 2.4rem;
-      right: 0.1rem;
-      z-index: 1;
-    }
-  </style>
 </body>
 
-<script>
+<script th:inline="javascript">
+  let setId = /*[[${set?.id}]]*/ '';
+  let isEdit = setId != null;
+  let deletedFlashcardsIds = [];
+  let flashcardIdPrefix = 'flashcard-'.length;
+
   init();
   function init() {
-    init_remove_card_button();
-    init_add_card_button();
-    init_submit_button();
+    initRemoveCardButton();
+    initAddCardButton();
+    initSubmitButton();
+
+    if (isEdit) {
+      initFlashcardChange();
+      initDeleteSetBtn();
+    }
   }
 
-  function init_remove_card_button() {
+  function initRemoveCardButton() {
     let removeCardButtonList = $('.remove-card-btn');
     for (let removeButton of removeCardButtonList) {
-      console.log(removeButton);
       let card = removeButton.parentElement.parentElement;
       removeButton.onclick = function() {
+        let cardId = parseInt( card.id?.substring(flashcardIdPrefix) );
+        deletedFlashcardsIds.push( cardId );
         card.remove();
       }
     }
   }
 
 
-  function init_add_card_button() {
+  function initAddCardButton() {
     let addCardBtn = $('#add-flashcard-btn')[0];
     addCardBtn.onclick = create_flashcard;
   }
@@ -134,65 +167,169 @@
   }
 
 
-  function init_submit_button() {
+  function initSubmitButton() {
     let submitBtn = $('#submit-btn')[0];
-    submitBtn.onclick = function() {
-      let url = $('#create-set-form')[0].action;
-      let payload = form_to_json();
-      console.log(payload);
+    // new set
+    if (!isEdit) {
+      submitBtn.onclick = function() {
+        let url = origin + '/sets/create';
+        let payload = newSetToJson();
+        console.log(payload);
 
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      })
-      .then(res => {
-        if (res.status == 200) {
-          location.href = res.url;
-        }
-      });
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        })
+                .then(res => {
+                  if (res.status == 200) {
+                    location.href = res.url;
+                  }
+                });
+      }
+    }
+    // edit set
+    else {
+      submitBtn.onclick = function() {
+        let url = origin + '/api/v1/your-sets';
+        let payload = editSetToJson();
+        console.log(payload);
+
+        fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        })
+                .then(res => {
+                  return res.text();
+                })
+                .then(res => {
+                  console.log(res);
+                })
+      }
     }
   }
 
-  function form_to_json() {
+  function newSetToJson() {
     let payload = {};
 
-    let name = get_name();
-    let description = get_description();
-    let flashcardList = get_flashcardList();
+    let name = getName();
+    let description = getDescription();
+    let flashcardList = getFlashcardList();
     payload['name'] = name;
     payload['description'] = description;
     payload['flashcardList'] = flashcardList;
 
     return payload;
+  }
 
+  function editSetToJson() {
+    let payload = {};
 
-    function get_name() {
-      let input = $('input[name=name]')[0];
-      return input.value;
+    let name = getName();
+    let description = getDescription();
+    let flashcardChangeList = getFlashcardChangeList();
+    payload['id'] = setId;
+    payload['name'] = name;
+    payload['description'] = description;
+    payload['flashcardChangeList'] = flashcardChangeList;
+
+    return payload;
+  }
+
+  function getName() {
+    let input = $('input[name=name]')[0];
+    return input.value;
+  }
+
+  function getDescription() {
+    let input = $('input[name=description]')[0];
+    return input.value;
+  }
+
+  function getFlashcardList() {
+    let objList = [];
+
+    let htmlList = $('#flashcard-list')[0].children;
+    for (let i = 0; i < htmlList.length - 1; i++) {
+      let div = htmlList[i];
+      let frontDiv = div.children[1].children[0];
+      let frontValue = frontDiv.children[0].children[0].value;
+      let backDiv = div.children[1].children[1];
+      let backValue = backDiv.children[0].children[0].value;
+
+      let flashcard = {front: frontValue, back: backValue};
+      objList.push(flashcard);
     }
-    function get_description() {
-      let input = $('input[name=description]')[0];
-      return input.value;
-    }
-    function get_flashcardList() {
-      let objList = [];
 
+    return objList;
+  }
+
+  function getFlashcardChangeList() {
+    let objList = [];
+    addNewOrEditedFlashcards();
+    addDeletedFlashcards();
+
+    return objList;
+
+
+    function addNewOrEditedFlashcards() {
       let htmlList = $('#flashcard-list')[0].children;
       for (let i = 0; i < htmlList.length - 1; i++) {
         let div = htmlList[i];
+        if (div.hasAttribute('unchanged'))
+          continue;
+
+        let id = div.id == '' ? null : div.id.substring(flashcardIdPrefix);
         let frontDiv = div.children[1].children[0];
         let frontValue = frontDiv.children[0].children[0].value;
         let backDiv = div.children[1].children[1];
         let backValue = backDiv.children[0].children[0].value;
 
-        let flashcard = {front: frontValue, back: backValue};
-        objList.push(flashcard);
+        let flashcardChange = {id: id, body: {front: frontValue, back: backValue}};
+        objList.push(flashcardChange);
       }
+    }
 
-      return objList;
+    function addDeletedFlashcards() {
+      for (let deletedId of deletedFlashcardsIds) {
+        let flashcardChange = {id: deletedId};
+        objList.push( flashcardChange );
+      }
+    }
+  }
+
+  function initFlashcardChange() {
+    if (!isEdit) {
+      return;
+    }
+
+    let flashcardDivs = $('.flashcard-in-set');
+    for (let flashcard of flashcardDivs) {
+      let frontInput = flashcard.children[1].children[0].children[0].children[0];
+      let backInput = flashcard.children[1].children[1].children[0].children[0];
+
+      frontInput.onchange = () => flashcard.removeAttribute('unchanged');
+      backInput.onchange = () => flashcard.removeAttribute('unchanged');
+    }
+  }
+
+  function initDeleteSetBtn() {
+    let deleteBtn = $('#delete-set-btn')[0];
+    deleteBtn.onclick = function() {
+      let url = origin + '/api/v1/your-sets/' + setId;
+      fetch(url, {
+        method: 'DELETE'
+      })
+              .then(res => {
+                if (res.status == 200) {
+                  location.href = origin + '/profile?selected=sets';
+                }
+              })
     }
   }
 

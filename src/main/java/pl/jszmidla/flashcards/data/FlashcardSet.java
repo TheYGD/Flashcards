@@ -20,7 +20,7 @@ public class FlashcardSet extends BaseEntity {
     @JoinColumn(name="author_id")
     private User author;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Flashcard> flashcards;
 
 

@@ -3,15 +3,13 @@ package pl.jszmidla.flashcards.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.User;
-import pl.jszmidla.flashcards.data.dto.FlashcardSetResponse;
-import pl.jszmidla.flashcards.data.mapper.FlashcardMapper;
-import pl.jszmidla.flashcards.data.mapper.FlashcardSetMapper;
+import pl.jszmidla.flashcards.data.dto.flashcard.ActiveFlashcardSetResponse;
+import pl.jszmidla.flashcards.data.mapper.ActiveSetMapper;
 
 import java.util.List;
 
@@ -24,13 +22,15 @@ class HomeServiceTest {
 
     @Mock
     UsersRecentSetService usersRecentSetService;
-    FlashcardSetMapper flashcardSetMapper = new FlashcardSetMapper(new FlashcardMapper());
+    @Mock
+    UsersActiveSetService usersActiveSetService;
+    ActiveSetMapper flashcardSetMapper = new ActiveSetMapper();
     HomeService homeService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        homeService = new HomeService(usersRecentSetService, flashcardSetMapper);
+        homeService = new HomeService(usersRecentSetService, usersActiveSetService, flashcardSetMapper);
     }
 
 
@@ -39,10 +39,10 @@ class HomeServiceTest {
         List<FlashcardSet> expectedFlashcardSetList = createFlashcardSetList();
         when( usersRecentSetService.getUsersRecentSetListOrNull(any()) ).thenReturn(expectedFlashcardSetList);
 
-        List<FlashcardSetResponse> actualFlashcardSetList = homeService.getUsersRecentSets(any());
+        List<ActiveFlashcardSetResponse> actualFlashcardSetList = homeService.getUsersRecentSets(any());
 
         for (int i = 0; i < actualFlashcardSetList.size(); i++) {
-            assertEquals( expectedFlashcardSetList.get(i).getId(), actualFlashcardSetList.get(i).getId() );
+            assertEquals( expectedFlashcardSetList.get(i).getName(), actualFlashcardSetList.get(i).getName() );
         }
     }
 

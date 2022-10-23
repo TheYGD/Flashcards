@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import pl.jszmidla.flashcards.data.User;
-import pl.jszmidla.flashcards.data.dto.ChangePasswordRequest;
+import pl.jszmidla.flashcards.data.dto.account.ChangePasswordRequest;
 import pl.jszmidla.flashcards.repository.UserRepository;
 
 @Service

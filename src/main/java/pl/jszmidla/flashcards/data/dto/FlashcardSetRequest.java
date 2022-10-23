@@ -1,4 +1,4 @@
-package pl.jszmidla.flashcards.data.dto;
+package pl.jszmidla.flashcards.data.dto.flashcard;
 
 import lombok.Getter;
 import lombok.Setter;

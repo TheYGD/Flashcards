@@ -6,10 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.jszmidla.flashcards.data.User;
-import pl.jszmidla.flashcards.data.dto.FlashcardResponse;
-import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
-import pl.jszmidla.flashcards.data.dto.FlashcardSetResponse;
-import pl.jszmidla.flashcards.data.dto.RememberedAndUnrememberedFlashcardsSplitted;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardResponse;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardSetRequest;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardSetResponse;
+import pl.jszmidla.flashcards.data.dto.flashcard.edit.FlashcardSetChangeResponse;
 import pl.jszmidla.flashcards.service.FlashcardSetService;
 
 import javax.validation.Valid;
@@ -41,20 +41,12 @@ public class FlashcardSetController {
         return "flashcard-set/learn";
     }
 
-    @GetMapping("/search")
-    public String searchForSets(@RequestParam(defaultValue = "") String query, Model model) {
-        List<FlashcardSetResponse> setList = flashcardSetService.findSetsByQuery(query);
-        model.addAttribute("setList", setList);
-
-        return "flashcard-set/search";
-    }
-
     @GetMapping("/create")
     public String createSetPage() {
-        return "flashcard-set/create";
+        return "flashcard-set/create-edit";
     }
 
-    @PostMapping(value= "/create")
+    @PostMapping("/create")
     public String createSetPost(@RequestBody @Valid FlashcardSetRequest flashcardSetRequest,
                                 @AuthenticationPrincipal User user) {
         Long flashcardSetId = flashcardSetService.createSet(flashcardSetRequest, user);
@@ -62,10 +54,11 @@ public class FlashcardSetController {
         return "redirect:/sets/" + flashcardSetId;
     }
 
-    @DeleteMapping("/delete/{id}")
-    public String deleteSet(@PathVariable("id") Long setId, @AuthenticationPrincipal User user) {
-        flashcardSetService.deleteSet(setId, user);
+    @GetMapping("/{id}/edit")
+    public String editPage(@PathVariable long id, @AuthenticationPrincipal User user, Model model) {
+        FlashcardSetChangeResponse set = flashcardSetService.getSetChangeResponse(id, user);
+        model.addAttribute( "set", set );
 
-        return "redirect:/profile/sets"; // todo dsada
+        return "flashcard-set/create-edit";
     }
 }

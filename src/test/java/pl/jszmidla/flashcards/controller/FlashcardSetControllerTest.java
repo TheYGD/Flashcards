@@ -10,20 +10,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import pl.jszmidla.flashcards.data.FlashcardSet;
-import pl.jszmidla.flashcards.data.dto.FlashcardRequest;
-import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
-import pl.jszmidla.flashcards.data.dto.FlashcardSetResponse;
+import pl.jszmidla.flashcards.ObjectToJsonMapper;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardRequest;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardSetRequest;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardSetResponse;
+import pl.jszmidla.flashcards.data.dto.flashcard.edit.FlashcardSetChangeResponse;
 import pl.jszmidla.flashcards.service.FlashcardSetService;
 
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.LinkedList;
 import java.util.List;
 
 @ExtendWith({MockitoExtension.class})
@@ -32,6 +32,7 @@ class FlashcardSetControllerTest {
     @Mock
     FlashcardSetService flashcardSetService;
     MockMvc mockMvc;
+    ObjectToJsonMapper jsonMapper = new ObjectToJsonMapper();
 
 
     @BeforeEach
@@ -48,20 +49,9 @@ class FlashcardSetControllerTest {
     }
 
     @Test
-    void searchForSets() throws Exception {
-        List<FlashcardSetResponse> flashcardSetResponseList = new LinkedList<>();
-        String query = "search";
-        when( flashcardSetService.findSetsByQuery(any()) ).thenReturn(flashcardSetResponseList);
-
-        mockMvc.perform( get("/sets/search?query=" + query) )
-                .andExpect( model().attribute("setList", flashcardSetResponseList) )
-                .andExpect( view().name("flashcard-set/search") );
-    }
-
-    @Test
     void createSetPage() throws Exception {
         mockMvc.perform( get("/sets/create") )
-                .andExpect( view().name("flashcard-set/create") );
+                .andExpect( view().name("flashcard-set/create-edit") );
     }
 
     @Test
@@ -71,12 +61,19 @@ class FlashcardSetControllerTest {
         when( flashcardSetService.createSet(any(), any()) ).thenReturn(id);
 
         mockMvc.perform( requestBuilder )
+                .andExpect( status().is3xxRedirection() )
                 .andExpect( view().name("redirect:/sets/" + id) );
+    }
+
+    @Test
+    void createSetPostNoBody() throws Exception {
+        mockMvc.perform( post("/sets/create") )
+                .andExpect( status().isBadRequest() );
     }
 
     private MockHttpServletRequestBuilder createSetRequestBuilder() {
         FlashcardSetRequest flashcardSet = createSet();
-        String flashcardSetJson = convertObjectToJson(flashcardSet);
+        String flashcardSetJson = jsonMapper.toJson(flashcardSet);
 
         MockHttpServletRequestBuilder requestBuilder = post("/sets/create")
                 .contentType("application/json")
@@ -85,11 +82,10 @@ class FlashcardSetControllerTest {
         return requestBuilder;
     }
 
-
     private FlashcardSetRequest createSet() {
         FlashcardSetRequest flashcardSet = new FlashcardSetRequest();
-        flashcardSet.setName("name");
-        flashcardSet.setDescription("desc");
+        flashcardSet.setName("namee");
+        flashcardSet.setDescription("descc");
 
         FlashcardRequest flashcardDto1 = createFlashcard("front1", "back1");
         FlashcardRequest flashcardDto2 = createFlashcard("front2", "back2");
@@ -106,24 +102,24 @@ class FlashcardSetControllerTest {
         return flashcard;
     }
 
-    private String convertObjectToJson(Object object) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    @Test
+    void learnSet() throws Exception {
+        long id = 1L;
+        when( flashcardSetService.showSetToUser(anyLong()) ).thenReturn( new FlashcardSetResponse() );
+
+        mockMvc.perform(get("/sets/learn/" + id))
+                .andExpect( model().attributeExists("set") )
+                .andExpect( view().name("flashcard-set/learn") )
+                .andExpect( status().isOk() );
     }
 
     @Test
-    void deleteSet() throws Exception {
-        long id = 1;
-        mockMvc.perform(delete("/sets/delete/" + id))
-                .andExpect( view().name("redirect:/profile/sets") );
-    }
+    void editPage() throws Exception {
+        FlashcardSetChangeResponse set = new FlashcardSetChangeResponse();
+        when( flashcardSetService.getSetChangeResponse(anyLong(), any()) ).thenReturn(set);
 
-    @Test
-    void learnSet() {
-
+        mockMvc.perform( get("/sets/1/edit") )
+                .andExpect( model().attributeExists("set") )
+                .andExpect( view().name("flashcard-set/create-edit") );
     }
 }

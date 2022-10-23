@@ -20,20 +20,24 @@ public class SecurityConfig {
         http
             .csrf().disable()
             .authorizeRequests()
+                .mvcMatchers("/js/**", "/css/**", "/webjars/**", "/img/**").permitAll()
+                .mvcMatchers("/").permitAll()
+
+                .mvcMatchers("/register").permitAll()
+                .mvcMatchers("/change-password").permitAll()
+
                 .mvcMatchers("/sets/create").authenticated()
                 .mvcMatchers("/sets/delete/*").authenticated()
                 .mvcMatchers("/sets/learn/*").authenticated()
-
-                .mvcMatchers("/").permitAll()
-                .mvcMatchers("/register").permitAll()
-                .mvcMatchers("/js/**", "/css/**", "/webjars/**").permitAll()
                 .mvcMatchers("/sets/**").permitAll()
 
                 .anyRequest().authenticated()
             .and()
-            .formLogin( form -> form
-//                .loginPage("/login")
-                .permitAll());
+                .formLogin( form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/", true)
+                        .permitAll());
 
         return http.build();
     }

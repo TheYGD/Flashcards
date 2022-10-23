@@ -5,11 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.ObjectError;
-import pl.jszmidla.flashcards.service.RegisterService;
+import pl.jszmidla.flashcards.service.UserService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -20,24 +21,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @ExtendWith(MockitoExtension.class)
-class RegisterControllerTest {
+class UserControllerTest {
 
     @Mock
-    RegisterService registerService;
+    UserService registerService;
     MockMvc mockMvc;
 
 
     @BeforeEach
     void setUp() {
-        RegisterController controller = new RegisterController(registerService);
+        UserController controller = new UserController(registerService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-
     @Test
-    void registerPage() throws Exception {
+    @WithMockUser
+    void registerPageLoggedIn() throws Exception {
         mockMvc.perform(get("/register"))
-                .andExpect( view().name("user/register") );
+                .andExpect( view().name("redirect:/") );
     }
 
     @Test

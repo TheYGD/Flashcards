@@ -13,9 +13,9 @@
 
         <a th:href="@{__(${'/sets/learn/' + set.id})__}" class="btn btn-own-primary my-3">Start learning</a>
 
-        <hr class="mb-0"/>
-        <div class="row justify-content-around">
-            <div th:each="card : ${flashcards}" class="col-6 row px-4">
+        <hr class="mt-1"/>
+        <div class="row justify-content-around px-4">
+            <div th:each="card : ${flashcards}" class="col-6 row px-3">
                 <div class="row rounded-2 border border-2 p-0 m-0 mt-4" style="border-color: rgb(101, 203, 178) !important;">
                     <div class="card col me-0" style="height: 12rem;">
                         <p class="form-control h-100 my-3 p-3" th:text="${card.front}"></p>

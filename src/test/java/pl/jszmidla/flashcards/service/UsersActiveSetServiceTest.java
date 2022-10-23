@@ -2,19 +2,16 @@ package pl.jszmidla.flashcards.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import pl.jszmidla.flashcards.data.Flashcard;
 import pl.jszmidla.flashcards.data.FlashcardSet;
 import pl.jszmidla.flashcards.data.User;
 import pl.jszmidla.flashcards.data.UsersActiveSet;
-import pl.jszmidla.flashcards.data.dto.FlashcardResponse;
-import pl.jszmidla.flashcards.data.dto.RememberedAndUnrememberedFlashcardsSplitted;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardResponse;
+import pl.jszmidla.flashcards.data.dto.flashcard.RememberedAndUnrememberedFlashcardsSplitted;
 import pl.jszmidla.flashcards.data.exception.item.UsersActiveSetNotFoundException;
+import pl.jszmidla.flashcards.data.mapper.ActiveSetMapper;
 import pl.jszmidla.flashcards.data.mapper.FlashcardMapper;
 import pl.jszmidla.flashcards.repository.UsersActiveSetRepository;
 
@@ -36,13 +33,14 @@ class UsersActiveSetServiceTest {
     @Mock
     UsersRecentSetService usersRecentSetService;
     FlashcardMapper flashcardMapper = new FlashcardMapper();
+    ActiveSetMapper activeSetMapper = new ActiveSetMapper();
     UsersActiveSetService usersActiveSetService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         usersActiveSetService = new UsersActiveSetService(usersActiveSetRepository, flashcardSetService,
-                usersRecentSetService, flashcardMapper);
+                usersRecentSetService, flashcardMapper, activeSetMapper);
     }
 
 
@@ -52,7 +50,7 @@ class UsersActiveSetServiceTest {
         UsersActiveSet usersActiveSet = createUsersActiveSet(csv, new FlashcardSet());
         when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
 
-        UsersActiveSet actualUsersActiveSet = usersActiveSetService.getUsersActiveSet(new FlashcardSet(), new User());
+        UsersActiveSet actualUsersActiveSet = usersActiveSetService.getUsersActiveSet(new User(), new FlashcardSet());
         assertEquals( usersActiveSet, actualUsersActiveSet );
     }
 
@@ -75,7 +73,7 @@ class UsersActiveSetServiceTest {
         UsersActiveSet actualUsersActiveSet = usersActiveSetService.getOrCreateUsersActiveSet(new FlashcardSet(), user);
 
         assertThrows( UsersActiveSetNotFoundException.class, () ->
-                usersActiveSetService.getUsersActiveSet(new FlashcardSet(), user) );
+                usersActiveSetService.getUsersActiveSet(user, new FlashcardSet()) );
         assertEquals( user.getId(), actualUsersActiveSet.getUser().getId() );
     }
 
@@ -95,29 +93,18 @@ class UsersActiveSetServiceTest {
 
     @Test
     void markFlashcardAsRemembered() {
-        long flashcardId = 2L;
+        long id = 2L;
+        FlashcardSet flashcardSet = createFlashcardSet(List.of(new Flashcard(), new Flashcard()));
         UsersActiveSet usersActiveSet = spy( UsersActiveSet.class );
-        FlashcardSet flashcardSet = new FlashcardSet();
+        usersActiveSet.setFlashcardSet(flashcardSet);
         when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
 
-        usersActiveSetService.markFlashcardAsRemembered(flashcardId, flashcardId, new User());
+        usersActiveSetService.markFlashcardAsRemembered(id, id, new User());
 
-        verify( usersActiveSet ).addFlashcardToRemembered(flashcardId);
+        verify( usersActiveSet ).addFlashcardToRemembered(id);
         verify( usersActiveSetRepository ).save(usersActiveSet);
     }
 
-    @Test
-    void markFlashcardAsCompleted() {
-        long flashcardId = 2L;
-        UsersActiveSet usersActiveSet = spy( UsersActiveSet.class );
-        FlashcardSet flashcardSet = new FlashcardSet();
-        when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
-
-        usersActiveSetService.markSetAsCompleted(flashcardId, new User());
-
-        verify( usersActiveSet ).incrementExpirationInterval();
-        verify( usersActiveSetRepository ).save(usersActiveSet);
-    }
 
     @Test
     void reloadSetSooner() {
@@ -127,7 +114,6 @@ class UsersActiveSetServiceTest {
 
         usersActiveSetService.reloadSetSooner(1L, new User());
 
-        verify( usersActiveSet ).adjustExpirationDate();
         verify( usersActiveSet ).clearRememberedFlashcards();
         verify( usersActiveSetRepository ).save(usersActiveSet);
     }
@@ -135,7 +121,7 @@ class UsersActiveSetServiceTest {
     UsersActiveSet createUsersActiveSet(String csv, FlashcardSet flashcardSet) {
         UsersActiveSet usersActiveSet = new UsersActiveSet();
         usersActiveSet.setRememberedFlashcardsCSV(csv);
-        usersActiveSet.setExpirationDate(LocalDateTime.now().plusDays(1));
+        usersActiveSet.setReloadDate(LocalDateTime.now().plusDays(1));
         usersActiveSet.setFlashcardSet(flashcardSet);
         return usersActiveSet;
     }
@@ -144,11 +130,11 @@ class UsersActiveSetServiceTest {
     void getSetExpirationDate() {
         LocalDateTime date = LocalDateTime.now();
         UsersActiveSet usersActiveSet = new UsersActiveSet();
-        usersActiveSet.setExpirationDate(date);
+        usersActiveSet.setReloadDate(date);
         when( flashcardSetService.findById( any()) ).thenReturn( new FlashcardSet() );
         when( usersActiveSetRepository.findByUserAndFlashcardSet(any(), any()) ).thenReturn(Optional.of(usersActiveSet));
 
-        LocalDateTime actualDate = usersActiveSetService.getSetExpirationDate(anyLong(), new User());
+        LocalDateTime actualDate = usersActiveSetService.getSetReloadDate(anyLong(), new User());
 
         assertEquals(date, actualDate);
     }

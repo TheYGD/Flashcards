@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{ fragments/layout :: layout (body=~{::body}, script=~{::script}, title='Settings')}">
+
+<body>
+  <div class="container">
+    <h1 class="mt-5 mb-4">Profile</h1>
+
+    <div class="row mb-5">
+
+      <div class="col-3 container">
+        <div>
+          <ul class="list-group shadow-sm rounded-2 mb-3">
+            <li class="list-group-item hover-dark" id="profile-profile-button"
+                th:text="#{profile.profile.title}">Profile</li>
+            <li class="list-group-item hover-dark" id="profile-information-button"
+                th:text="#{profile.account-info.title}">Account's information</li>
+            <li class="list-group-item hover-dark" id="profile-password-button"
+                th:text="#{profile.change-password.title}">Change password</li>
+            <li class="list-group-item hover-dark" id="profile-sets-button"
+                th:text="#{profile.your-sets.title}">Your sets</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-9 container-lg m-0 border shadow-sm rounded-2 p-5 mb-5">
+
+        <!--    PROFILE/BIO    -->
+        <div id="profile-profile-div">
+          <form action="/profile/bio" method="put" id="profile-profile-form" class="row">
+            <h2 class="mb-4" th:text="#{profile.profile.title}">Profile</h2>
+
+            <label th:text="#{profile.profile.bio}" for="bio">Bio</label>
+            <textarea class="form-control" id="bio" name="bio" th:text="${user.bio}"></textarea>
+
+            <button class="btn btn-own-primary col-2 offset-5 mt-4 mb-1" id="form-profile-button"
+                    type="button" disabled th:text="#{profile.change}">Change</button>
+          </form>
+        </div>
+
+        <!--    ACCOUNT'S INFORMATION    -->
+        <div id="profile-information-div" style="display: none;">
+          <h2 class="mb-4" th:text="#{profile.account-info.title}">Account's information</h2>
+
+          <div class="col-4 offset-4">
+            <div class="form-group">
+              <label th:text="#{profile.account.username}" for="username">Username</label>
+              <input disabled class="form-control mt-1 mb-3 bg-white" type="text" id="username" th:min="6" th:max="20" name="username"
+                     th:value="${user.username}">
+            </div>
+
+            <div class="form-group">
+              <label th:text="#{profile.account.email}" for="email">Email</label>
+              <input disabled class="form-control mt-1 mb-3 bg-white" type="email" id="email" name="email" th:value="${user.email}">
+            </div>
+          </div>
+        </div>
+
+        <!--    CHANGE PASSWORD    -->
+        <div id="profile-password-div" style="display: none;">
+          <form action="/profile/password" method="put" id="profile-password-form" class="row">
+            <h2 class="mb-4" th:text="#{profile.change-password.title}">Change Password</h2>
+
+            <div class="col-4 offset-4">
+              <div class="form-group">
+                <label th:text="#{profile.change-password.old}" for="oldPassword">Old password</label>
+                <input required class="form-control mt-1 mb-3" type="password" id="oldPassword" minlength="8"
+                       maxlength="30" name="oldPassword">
+              </div>
+
+              <div class="form-group">
+                <label th:text="#{profile.change-password.new}" for="newPassword">New password</label>
+                <input required class="form-control mt-1 mb-3" type="password" id="newPassword" minlength="8"
+                       maxlength="30" name="newPassword">
+              </div>
+            </div>
+
+            <button class="btn btn-own-primary col-2 offset-5 mt-4 mb-1" id="form-password-button"
+                    type="button" th:text="#{profile.change}">Change</button>
+          </form>
+        </div>
+
+        <!--    YOUR SETS    -->
+        <div id="profile-sets-div" style="display: none;">
+          <h2 class="mb-3" th:text="#{profile.your-sets.title}">Your sets</h2>
+
+          <div class="row" id="sets-div">
+            <div class="d-inline-block mx-0 mt-2 p-3 py-0 col-4" th:each="set : ${sets}" >
+              <div class="w-100 h-100">
+                <a class="card ms-2 mt-4 text-decoration-none text-black hover-dark" style="height: 15rem;"
+                   th:href="${'/sets/' + set.id + '/edit'}">
+                  <h6 class="card-header py-3 bg-own-primary hover-light" th:text="${set.name}">Name</h6>
+                  <p class="p-3" th:text="${set.description}">Description</p>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+
+<script>
+  $(document).ready( function() {
+    initSideButtons();
+
+    initProfileInputsOnChange();
+    initProfileFormButton();
+    initPasswordFormButton();
+  });
+
+  function initProfileFormButton() {
+    let submitButton = $('#form-profile-button')[0];
+
+    let form = $('#profile-profile-form')[0];
+    submitButton.onclick = function() {
+      fetch(form.action, {
+        method: 'PUT',
+        body: new FormData(form)
+      });
+    };
+  }
+
+  function initProfileInputsOnChange() {
+    let textArea = $('#bio')[0];
+
+    textArea.onchange = function () {
+      let submitButton = $('#form-profile-button')[0];
+      submitButton.disabled = false;
+    }
+  }
+
+  function initSideButtons() {
+    let profileButtons = [ $('#profile-profile-button')[0], $('#profile-information-button')[0],
+      $('#profile-password-button')[0] ];
+    let profileDivs = [ $('#profile-profile-div')[0], $('#profile-information-div')[0],
+      $('#profile-password-div')[0], $('#profile-sets-div')[0] ];
+
+    for (let i = 0 ; i < profileButtons.length; i++) {
+      profileButtons[i].onclick = function() {
+        profileDivs.forEach( div => div.style.display = 'none' )
+
+        let div = profileDivs[i];
+        div.style.display = 'block';
+      }
+    }
+
+    let setsButton = $('#profile-sets-button')[0];
+    let setsDiv = $('#profile-sets-div')[0];
+    setsButton.onclick = function () {
+      profileDivs.forEach( div => div.style.display = 'none' );
+      setsDiv.style.display = 'block';
+
+      loadYourSets();
+    }
+  }
+
+  function initPasswordFormButton() {
+    let submitButton = $('#form-password-button')[0];
+
+    let form = $('#profile-password-form')[0];
+    submitButton.onclick = function() {
+      if (!isChangePasswordDataValid()) {
+        return;
+      }
+      fetch(form.action, {
+        method: 'PUT',
+        body: new FormData(form)
+      });
+    };
+
+    function isChangePasswordDataValid() {
+      let oldPasswordIn = $('#oldPassword')[0];
+      let newPasswordIn = $('#newPassword')[0];
+      let isValid = true;
+
+      let oldPassword = oldPasswordIn.value;
+      if (oldPassword.length < 8 || oldPassword.length > 30) {
+        oldPasswordIn.reportValidity();
+        isValid = false;
+      }
+
+      let newPassword = newPasswordIn.value;
+      if (newPassword.length < 8 || newPassword.length > 30) {
+        newPasswordIn.reportValidity();
+        isValid = false;
+      }
+
+      return isValid;
+    }
+  }
+
+  function loadYourSets() {
+    let url = location.origin + '/api/v1/your-sets';
+    let setsDiv = $('#sets-div')[0];
+    fetch(url)
+            .then( response => {
+              return response.json();
+            })
+            .then( response => {
+              for (let set of response) {
+                let setElement = createSet( set );
+                setsDiv.appendChild(setElement);
+              }
+            })
+
+
+    function createSet(setObj) {
+      let [id, name, description] = [setObj.id, setObj.name, setObj.description];
+
+      let mainDiv = document.createElement('div');
+      mainDiv.className = 'd-inline-block mx-0 mt-2 p-3 py-0 col-4';
+
+      let div2 = document.createElement('div');
+      div2.className = 'w-100 h-100 position-relative';
+
+      let aElement = document.createElement('a');
+      aElement.className = 'card ms-2 mt-4 text-decoration-none text-black hover-dark';
+      aElement.style.height = '15rem';
+      aElement.href = `/sets/${id}`;
+
+      let editElement = document.createElement('a');
+      editElement.className = 'btn btn-outline-light position-absolute fa fa-pencil p-2';
+      editElement.style.top = '0.6rem';
+      editElement.style.right = '0.6rem';
+      editElement.style.height = '2rem';
+      editElement.style.width = '2rem';
+      editElement.href = `/sets/${id}/edit`;
+
+      let h6Element = document.createElement('h6');
+      h6Element.className = 'card-header py-3 bg-own-primary hover-light';
+      h6Element.innerText = name;
+
+      let pElement = document.createElement('p');
+      pElement.className = 'p-3';
+      pElement.innerText = description;
+
+      aElement.appendChild(editElement);
+      aElement.appendChild(h6Element);
+      aElement.appendChild(pElement);
+
+      div2.appendChild(aElement);
+
+      mainDiv.appendChild(div2);
+
+      return mainDiv;
+    }
+  }
+
+
+</script>
+
+</html>

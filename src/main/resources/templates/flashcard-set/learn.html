@@ -23,7 +23,7 @@
     init();
     async function init() {
         await loadFlashcardsFromTheServer();
-        initCard();
+        initCardOrShowFinish();
     }
 
 
@@ -40,7 +40,7 @@
             });
     }
 
-    function initCard() {
+    function initCardOrShowFinish() {
         if (flashcardList.length != 0)
             createNextCard();
 
@@ -190,7 +190,6 @@
         failBtn.onclick = null;
 
         if (flashcardList.length == 0) {
-            completeSetOnServer();
             setTimeout(showFinishScreen, 500);
             return;
         }

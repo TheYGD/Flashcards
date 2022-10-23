@@ -2,11 +2,10 @@ package pl.jszmidla.flashcards.data.mapper;
 
 import org.junit.jupiter.api.Test;
 import pl.jszmidla.flashcards.data.FlashcardSet;
-import pl.jszmidla.flashcards.data.dto.FlashcardRequest;
-import pl.jszmidla.flashcards.data.dto.FlashcardSetRequest;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardRequest;
+import pl.jszmidla.flashcards.data.dto.flashcard.FlashcardSetRequest;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
