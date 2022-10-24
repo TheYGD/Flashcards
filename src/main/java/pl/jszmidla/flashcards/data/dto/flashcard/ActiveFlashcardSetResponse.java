@@ -13,5 +13,9 @@ public class ActiveFlashcardSetResponse {
     private String description;
     private Long flashcardCount;
     private ActiveSetState state;
+
+    public String getCssClass() {
+        return state != null ? state.getCssClass() : "";
+    }
 }
 
