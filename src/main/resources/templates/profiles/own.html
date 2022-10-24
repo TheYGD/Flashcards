@@ -19,6 +19,10 @@
             <li class="list-group-item hover-dark" id="profile-sets-button"
                 th:text="#{profile.your-sets.title}">Your sets</li>
           </ul>
+
+          <ul class="list-group shadow-sm rounded-2 mb-3">
+            <a class="list-group-item hover-dark text-danger" href="/logout" th:text="#{profile.logout.title}">Logout</a>
+          </ul>
         </div>
       </div>
 
@@ -84,15 +88,19 @@
           <h2 class="mb-3" th:text="#{profile.your-sets.title}">Your sets</h2>
 
           <div class="row" id="sets-div">
-            <div class="d-inline-block mx-0 mt-2 p-3 py-0 col-4" th:each="set : ${sets}" >
-              <div class="w-100 h-100">
-                <a class="card ms-2 mt-4 text-decoration-none text-black hover-dark" style="height: 15rem;"
-                   th:href="${'/sets/' + set.id + '/edit'}">
-                  <h6 class="card-header py-3 bg-own-primary hover-light" th:text="${set.name}">Name</h6>
-                  <p class="p-3" th:text="${set.description}">Description</p>
-                </a>
-              </div>
-            </div>
+<!--            <div class="d-inline-block mx-0 mt-2 p-3 py-0 col-4" th:each="set : ${sets}" >-->
+<!--              <div class="w-100 h-100">-->
+<!--                <a class="card ms-2 mt-4 text-decoration-none text-black hover-dark" style="height: 15rem;"-->
+<!--                   th:href="${'/sets/' + set.id + '/edit'}">-->
+<!--                  <h6 class="card-header py-3 bg-own-primary hover-light" th:text="${set.name}">Name</h6>-->
+<!--                  <p class="p-3" th:text="${set.description}">Description</p>-->
+<!--                  <div class="flashcard-count align-items-center">-->
+<!--                    <p class="my-auto ms-1" th:text="${set.flashcardCount}">Count</p>-->
+<!--                    <i class="fa-regular fa-square my-auto"></i>-->
+<!--                  </div>-->
+<!--                </a>-->
+<!--              </div>-->
+<!--            </div>-->
           </div>
         </div>
 
@@ -207,7 +215,7 @@
 
 
     function createSet(setObj) {
-      let [id, name, description] = [setObj.id, setObj.name, setObj.description];
+      let [id, name, description, flashcardCount] = [setObj.id, setObj.name, setObj.description, setObj.flashcardCount];
 
       let mainDiv = document.createElement('div');
       mainDiv.className = 'd-inline-block mx-0 mt-2 p-3 py-0 col-4';
@@ -236,9 +244,23 @@
       pElement.className = 'p-3';
       pElement.innerText = description;
 
+      let countDiv = document.createElement('div');
+      countDiv.className = 'flashcard-count align-items-center';
+
+      let countP = document.createElement('p');
+      countP.className = 'my-auto ms-1';
+      countP.innerHTML = flashcardCount;
+
+      let countI = document.createElement('i');
+      countI.className = 'fa-regular fa-square my-auto';
+
+      countDiv.appendChild(countP);
+      countDiv.appendChild(countI);
+
       aElement.appendChild(editElement);
       aElement.appendChild(h6Element);
       aElement.appendChild(pElement);
+      aElement.appendChild(countDiv);
 
       div2.appendChild(aElement);
 

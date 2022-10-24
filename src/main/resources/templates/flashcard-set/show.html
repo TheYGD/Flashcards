@@ -12,6 +12,8 @@
         <p th:text="${set.description}">Description</p>
 
         <a th:href="@{__(${'/sets/learn/' + set.id})__}" class="btn btn-own-primary my-3">Start learning</a>
+        <a th:if="${username == set.authorName}" th:href="@{__(${'/sets/' + set.id + '/edit'})__}"
+           class="btn btn-primary my-3 ms-2 opacity-80">Edit set</a>
 
         <hr class="mt-1"/>
         <div class="row justify-content-around px-4">

@@ -1,6 +1,7 @@
 package pl.jszmidla.flashcards.api;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -70,8 +71,17 @@ class UsersActiveSetApiTest {
         when( usersActiveSetService.getSetReloadDate(anyLong(), any()) ).thenReturn(date);
         MvcResult result = mockMvc.perform(get("/api/v1/active-sets/1/expire"))
                 .andReturn();
+        String stringResult = result.getResponse().getContentAsString();
 
-        assertEquals( expectedString, result.getResponse().getContentAsString() );
+        // removing excessive 0 from nanoseconds
+        while (expectedString.charAt( expectedString.length() - 2 ) == '0') {
+            expectedString = expectedString.substring(0, expectedString.length() - 2) + ']';
+        }
+        while (stringResult.charAt( stringResult.length() - 2 ) == '0') {
+            stringResult = stringResult.substring(0, stringResult.length() - 2) + ']';
+        }
+
+        assertEquals( expectedString, stringResult );
     }
 
     @Test

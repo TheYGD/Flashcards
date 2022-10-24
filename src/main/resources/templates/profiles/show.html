@@ -18,6 +18,10 @@
                         <div class="h-100 w-100 position-absolute" th:classappend="${set.cssClass}" ></div>
                         <h6 class="card-header py-3 bg-own-primary hover-light" th:text="${set.name}">Name</h6>
                         <p class="p-3" th:text="${set.description}">Description</p>
+                        <div class="flashcard-count align-items-center">
+                            <p class="my-auto ms-1" th:text="${set.flashcardCount}">Count</p>
+                            <i class="fa-regular fa-square my-auto"></i>
+                        </div>
                     </a>
                 </div>
         </div>

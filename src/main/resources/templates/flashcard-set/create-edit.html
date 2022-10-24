@@ -3,7 +3,7 @@
 
 <body>
   <div class="container">
-    <h1 class="mt-5">Create flashcard set</h1>
+    <h1 class="mt-5" th:text="${set == null ? 'Create' : 'Edit' + ' flashcard set'}">Title</h1>
 
     <form action="post" id="create-set-form" th:action="@{/sets/create}">
       <div class="form-group mt-3">
@@ -78,10 +78,10 @@
 
       <div class="row mt-5 pt-3 justify-content-center">
         <button th:classappend="${set != null ? 'col-3' : 'col-4'}" class="btn btn-own-primary mx-5" style="height: 4rem;"
-                type="button" id="submit-btn">
+                type="button" id="submit-btn" th:text="${set != null ? 'Save' : 'Create'}" th:disabled="${set != null}">
           Create
         </button>
-        <button th:if="${set != null}" class="btn col-3 btn-danger mx-5" style="height: 4rem; opacity: 90%;" type="button"
+        <button th:if="${set != null}" class="btn col-3 btn-danger mx-5 opacity-80" style="height: 4rem;" type="button"
                 id="delete-set-btn">
           Delete
         </button>
@@ -205,11 +205,10 @@
           body: JSON.stringify(payload)
         })
                 .then(res => {
-                  return res.text();
-                })
-                .then(res => {
-                  console.log(res);
-                })
+                  if (res.status == 200) {
+                    location.href = origin + `/sets/${setId}`;
+                  }
+                });
       }
     }
   }
@@ -308,13 +307,19 @@
       return;
     }
 
+    let saveBtn = $('#submit-btn')[0];
     let flashcardDivs = $('.flashcard-in-set');
     for (let flashcard of flashcardDivs) {
       let frontInput = flashcard.children[1].children[0].children[0].children[0];
       let backInput = flashcard.children[1].children[1].children[0].children[0];
 
-      frontInput.onchange = () => flashcard.removeAttribute('unchanged');
-      backInput.onchange = () => flashcard.removeAttribute('unchanged');
+      frontInput.onchange = inputChange;
+      backInput.onchange = inputChange;
+
+      function inputChange() {
+        flashcard.removeAttribute('unchanged');
+        saveBtn.disabled = false;
+      }
     }
   }
 
