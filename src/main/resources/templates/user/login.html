@@ -6,30 +6,35 @@
     <div class="row mt-5 position-relative" style="top: 15%;">
       <div class="row col-10 offset-1 justify-content-around">
         <div id="login-div" class="col-5">
-          <h1>Log In</h1>
+          <h1 th:text="#{login.title}">Log In</h1>
 
           <form class="border rounded-2 px-4 py-5 justify-content-center mt-4" action="/login" method="post">
             <div class="offset-2">
               <label class="form-label d-block col-10">
-                login
+                <th:block th:text="#{login.login}">login</th:block>
                 <input class="form-control mt-1" type="text" name="username">
               </label>
 
               <label class="form-label d-block col-10">
-                password
+                <th:block th:text="#{login.password}">password</th:block>
                 <input class="form-control mt-1" type="password" name="password">
               </label>
 
-              <button class="btn btn-own-primary my-3 col-10" type="submit">Log in</button>
+              <button class="btn btn-own-primary my-3 col-10" type="submit" th:text="#{login.title}">Log in</button>
 
-              <p class="mt-3">Forgot password? <span><a class="text-own-green" href="/change-password">Change password</a></span> </p>
+              <p class="mt-3">
+                <th:block th:text="#{login.forgot-password}">Forgot password?</th:block>
+                <span>
+                  <a th:text="#{login.change-password}" class="text-own-green" href="/change-password">Change password</a>
+                </span>
+              </p>
             </div>
           </form>
         </div>
         <div id="register-div" class="col-5 d-flex flex-column align-items-center justify-content-center">
-          <h2 class="text-center">Haven't registered yet?</h2>
-          <h4 class="text-own-green text-center mt-2">Do it right now!</h4>
-          <a class="btn btn-own-primary col-8 mt-2" href="/register">Register</a>
+          <h2 class="text-center" th:text="#{login.havent-registered-yet}">Haven't registered yet?</h2>
+          <h4 class="text-own-green text-center mt-2" th:text="#{login.register-now}">Do it right now!</h4>
+          <a class="btn btn-own-primary col-8 mt-2" href="/register" th:text="#{login.register}">Register</a>
         </div>
       </div>
     </div>

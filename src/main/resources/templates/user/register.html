@@ -2,30 +2,30 @@
 <html lang="en" th:replace="fragments/layout :: layout(body=~{::body}, title='Register', script=~{::script})">
 <body>
     <div class="container">
-        <h1 class="mt-5 mb-4">Register</h1>
+        <h1 class="mt-5 mb-4" th:text="#{register.title}">Register</h1>
 
         <form class="border rounded-2 p-5" th:action="@{/register}" method="post">
             <div class="form-group mb-4">
-                <label class="form-label" for="email">Email</label>
+                <label class="form-label" for="email" th:text="#{register.email}">Email</label>
                 <input required class="form-control" type="text" id="email" name="email">
             </div>
 
             <div class="form-group mb-4">
-                <label class="form-label" for="username">Username</label>
+                <label class="form-label" for="username" th:text="#{register.username}">Username</label>
                 <input minlength="5" maxlength="20" required class="form-control" type="text" id="username" name="username">
             </div>
 
             <div class="form-group mb-4">
-                <label class="form-label" for="password">Password</label>
+                <label class="form-label" for="password" th:text="#{register.password}">Password</label>
                 <input minlength="8" maxlength="30" required class="form-control" type="password" id="password" name="password">
             </div>
 
             <div class="form-group mb-4">
-                <label class="form-label" for="password2">Repeat password</label>
+                <label class="form-label" for="password2" th:text="#{register.repeat-password}">Repeat password</label>
                 <input minlength="8" maxlength="30" required class="form-control" type="password" id="password2" name="password2">
             </div>
 
-            <button id="registerBtn" class="btn btn-own-primary mt-3" type="submit">Register</button>
+            <button id="registerBtn" class="btn btn-own-primary mt-3" type="submit" th:text="#{register.title}">Register</button>
         </form>
     </div>
 </body>

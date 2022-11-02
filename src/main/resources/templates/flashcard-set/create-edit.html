@@ -3,21 +3,23 @@
 
 <body>
   <div class="container">
-    <h1 class="mt-5" th:text="${set == null ? 'Create' : 'Edit' + ' flashcard set'}">Title</h1>
+    <h1 class="mt-5" th:text="${#messages.msg( 'create-set.' + (set == null ? 'create' : 'edit') ) + ' '
+      + #messages.msg('create-set.set')}">
+      Title</h1>
 
     <form action="post" id="create-set-form" th:action="@{/sets/create}">
       <div class="form-group mt-3">
-        <label class="form-label" for="name">Name</label>
+        <label class="form-label" for="name" th:text="#{create-set.name}">Name</label>
         <input class="form-control" type="text" id="name" name="name" th:value="${set != null ? set.name : ''}">
       </div>
 
       <div class="form-group mt-3">
-        <label class="form-label" for="description">Description</label>
+        <label class="form-label" for="description" th:text="#{create-set.description}">Description</label>
         <input class="form-control" type="text" id="description" name="description"
                th:value="${set != null ? set.description : ''}">
       </div>
 
-      <h2 class="mt-5">Flashcards</h2>
+      <h2 class="mt-5" th:text="#{create-set.flashcards}">Flashcards</h2>
       <div class="row ms-4 ps-2" id="flashcard-list">
         <!--    Card in new set    -->
         <div class="col-6 row px-4" th:if="${set == null}">
@@ -27,13 +29,13 @@
           <div class="row rounded-2 border border-2 p-0 m-0" style="border-color: rgb(101, 203, 178) !important;">
             <div class="card col me-0" style="height: 15rem;">
               <label class="h-100 mt-3 mx-2">
-                Front
+                <th:block th:text="#{create-set.flashcard.front}">Front</th:block>
                 <textarea class="form-control h-75 mt-2" name="back"></textarea>
               </label>
             </div>
             <div class="card col ms-0" style="height: 15rem;">
               <label class="h-100 mt-3 mx-2">
-                Back
+                <th:block th:text="#{create-set.flashcard.back}">Back</th:block>
                 <textarea class="form-control h-75 mt-2" name="back"></textarea>
               </label>
             </div>
@@ -50,13 +52,13 @@
             <div class="row rounded-2 border border-2 p-0 m-0" style="border-color: rgb(101, 203, 178) !important;">
               <div class="card col me-0" style="height: 15rem;">
                 <label class="h-100 mt-3 mx-2">
-                  Front
+                  <th:block th:text="#{create-set.flashcard.front}">Front</th:block>
                   <textarea class="form-control h-75 mt-2" name="back" th:text="${flashcard.front}"></textarea>
                 </label>
               </div>
               <div class="card col ms-0" style="height: 15rem;">
                 <label class="h-100 mt-3 mx-2">
-                  Back
+                  <th:block th:text="#{create-set.flashcard.back}">Back</th:block>
                   <textarea class="form-control h-75 mt-2" name="back" th:text="${flashcard.back}"></textarea>
                 </label>
               </div>
@@ -69,7 +71,7 @@
             <div class="">
               <button class="btn btn-lg btn-own-primary mx-auto pt-3" id="add-flashcard-btn" type="button">
                 <span class="fa fa-plus"></span>
-                <p>Add flashcard</p>
+                <p th:text="#{create-set.add-flashcard}">Add flashcard</p>
               </button>
             </div>
           </div>
@@ -78,11 +80,12 @@
 
       <div class="row mt-5 pt-3 justify-content-center">
         <button th:classappend="${set != null ? 'col-3' : 'col-4'}" class="btn btn-own-primary mx-5" style="height: 4rem;"
-                type="button" id="submit-btn" th:text="${set != null ? 'Save' : 'Create'}" th:disabled="${set != null}">
+                type="button" id="submit-btn" th:disabled="${set != null}"
+                th:text="${#messages.msg( 'create-set.' + (set == null ? 'create' : 'edit') )}">
           Create
         </button>
         <button th:if="${set != null}" class="btn col-3 btn-danger mx-5 opacity-80" style="height: 4rem;" type="button"
-                id="delete-set-btn">
+                id="delete-set-btn" th:text="#{create-set.delete}">
           Delete
         </button>
       </div>
@@ -91,10 +94,13 @@
 </body>
 
 <script th:inline="javascript">
-  let setId = /*[[${set?.id}]]*/ '';
-  let isEdit = setId != null;
+  const setId = /*[[${set?.id}]]*/ '';
+  const isEdit = setId != null;
+  const flashcardIdPrefix = 'flashcard-'.length;
+  const frontName = /*[[#{create-set.flashcard.front}]]*/ '';
+  const backName = /*[[#{create-set.flashcard.back}]]*/ '';
+
   let deletedFlashcardsIds = [];
-  let flashcardIdPrefix = 'flashcard-'.length;
 
   init();
   function init() {
@@ -145,13 +151,13 @@
     divWithCard.style.setProperty('border-color', 'rgb(101, 203, 178)', 'important');
     divWithCard.innerHTML = '<div class="card col me-0" style="height: 15rem;">\n' +
             '              <label class="h-100 mt-3 mx-2">\n' +
-            '                Front\n' +
+            `                ${frontName}\n` +
             '                <textarea class="form-control h-75 mt-2" name="back"></textarea>\n' +
             '              </label>\n' +
             '            </div>\n' +
             '            <div class="card col ms-0" style="height: 15rem;">\n' +
             '              <label class="h-100 mt-3 mx-2">\n' +
-            '                Back\n' +
+            `                ${backName}\n` +
             '                <textarea class="form-control h-75 mt-2" name="back"></textarea>\n' +
             '              </label>\n' +
             '            </div>';

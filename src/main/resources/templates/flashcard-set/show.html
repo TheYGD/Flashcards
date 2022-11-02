@@ -5,15 +5,16 @@
     <div class="container">
         <h1 class="mt-5" th:text="${set.name}">Set name</h1>
         <p>
-            Author:
+            <th:block th:text="#{flashcard-set.author}">Author</th:block>
             <a class="text-own-green text-decoration-none" th:href="@{__${'/profiles/' + set.authorId}__}"
                th:text="${' ' + set.authorName}">Username</a>
         </p>
         <p th:text="${set.description}">Description</p>
 
-        <a th:href="@{__(${'/sets/learn/' + set.id})__}" class="btn btn-own-primary my-3">Start learning</a>
+        <a th:href="@{__(${'/sets/learn/' + set.id})__}" class="btn btn-own-primary my-3"
+            th:text="#{flashcard-set.start-learning}">Start learning</a>
         <a th:if="${username == set.authorName}" th:href="@{__(${'/sets/' + set.id + '/edit'})__}"
-           class="btn btn-primary my-3 ms-2 opacity-80">Edit set</a>
+           class="btn btn-primary my-3 ms-2 opacity-80" th:text="#{flashcard-set.edit}">Edit</a>
 
         <hr class="mt-1"/>
         <div class="row justify-content-around px-4">

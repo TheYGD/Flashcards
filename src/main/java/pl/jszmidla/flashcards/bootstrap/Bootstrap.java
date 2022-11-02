@@ -86,12 +86,6 @@ public class Bootstrap implements CommandLineRunner {
         FlashcardSet flashcardSet6 = createSet("Peryferia komputerowe w j.angielskim", "Computers",
                 author, flashcardList6);
 
-        flashcardRepository.saveAll(flashcardList1);
-        flashcardRepository.saveAll(flashcardList2);
-        flashcardRepository.saveAll(flashcardList3);
-        flashcardRepository.saveAll(flashcardList4);
-        flashcardRepository.saveAll(flashcardList5);
-        flashcardRepository.saveAll(flashcardList6);
 
         flashcardSetRepository.saveAll(List.of(flashcardSet1, flashcardSet2, flashcardSet3, flashcardSet4, flashcardSet5,
                 flashcardSet6));

@@ -2,7 +2,7 @@
 <html lang="en" th:replace="fragments/layout :: layout(body=~{::body}, title='Search for set')">
 <body>
   <div class="container">
-    <h1 class="mt-5">Search for flashcard sets</h1>
+    <h1 class="mt-5" th:text="#{flashcard-set.search.title}">Search for flashcard sets</h1>
 
     <div class="row">
       <form class="row mt-3" th:action="@{/sets/search}" method="get">

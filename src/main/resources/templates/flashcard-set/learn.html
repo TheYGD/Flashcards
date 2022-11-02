@@ -15,9 +15,12 @@
 
 
 <script th:inline="javascript">
-    let COMPLETED_TEXT = 'Congratulations! You have finished this set';
-    let RELOAD_SET_TEXT_ARR = ['It will be automatically reloaded on ', ', or reload it manually.'];
-    let setId = /*[[${set.id}]]*/ '';
+    const COMPLETED_TEXT = /*[[#{flashcard-set.learn.congratulations}]]*/ '';
+    const RELOAD_SET_PREFIX = /*[[#{flashcard-set.learn.reload-message.prefix}]]*/ '';
+    const RELOAD_SET_SUFFIX = /*[[#{flashcard-set.learn.reload-message.suffix}]]*/ '';
+    const RELOAD_SET_TEXT_ARR = [RELOAD_SET_PREFIX, RELOAD_SET_SUFFIX];
+    const RELOAD_NAME = /*[[#{flashcard-set.learn.reload}]]*/ '';
+    const SET_ID = /*[[${set.id}]]*/ '';
     let flashcardList = [];
     let rememberedFlashcardList = [];
 
@@ -29,7 +32,7 @@
 
 
     async function loadFlashcardsFromTheServer() {
-        let url = location.origin + `/api/v1/active-sets/${setId}`;
+        let url = location.origin + `/api/v1/active-sets/${SET_ID}`;
 
         await fetch(url)
             .then(res => {
@@ -180,7 +183,7 @@
     }
 
     async function markFlashcardAsRememberedOnServer(flashcardId) {
-        let url = location.origin + `/api/v1/active-sets/${setId}/remembered/${flashcardId}`;
+        let url = location.origin + `/api/v1/active-sets/${SET_ID}/remembered/${flashcardId}`;
         await fetch(url, {
             method: 'POST'
         });
@@ -216,7 +219,7 @@
         let reloadSetBtn = document.createElement('button');
         reloadSetBtn.className = 'btn btn-outline-success opacity-75 mt-3 mx-auto';
         reloadSetBtn.type = 'button';
-        reloadSetBtn.innerHTML = 'Reload set';
+        reloadSetBtn.innerHTML = RELOAD_NAME;
         reloadSetBtn.onclick = reloadSet;
 
         finishDiv.appendChild(finishText);
@@ -227,7 +230,7 @@
     }
 
     function reloadSet() {
-        let url = location.origin + `/api/v1/active-sets/${setId}/reload`;
+        let url = location.origin + `/api/v1/active-sets/${SET_ID}/reload`;
         fetch(url, {
             method: 'POST'
         })
@@ -239,7 +242,7 @@
     }
 
     async function getSetExpirationDate() {
-        let url = location.origin + `/api/v1/active-sets/${setId}/expire`;
+        let url = location.origin + `/api/v1/active-sets/${SET_ID}/expire`;
 
         let fetchResult = await fetch(url, {
                 method: 'GET'
@@ -251,7 +254,7 @@
     }
 
     function completeSetOnServer() {
-        let url = location.origin + `/api/v1/active-sets/${setId}/completed`;
+        let url = location.origin + `/api/v1/active-sets/${SET_ID}/completed`;
         fetch(url, {
             method: 'POST'
         });
