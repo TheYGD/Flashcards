@@ -5,11 +5,12 @@ After the set completion, the set is being 'reloaded', which basically means tha
 Sets used by user are having colorful badges in their right upper corner, so that the user can easily see if the set is already reloaded and distinguish their active sets from others.
 
 ### Samples
-![image](https://user-images.githubusercontent.com/98745466/199354508-5c813147-6e0e-44d0-b134-930fad813f50.png)
-![image](https://user-images.githubusercontent.com/98745466/199354532-6f5d25ed-f255-455f-9522-f928f795f2d9.png)
-![image](https://user-images.githubusercontent.com/98745466/199354556-63acc855-03d3-4832-8e33-4e3f0c3eba2a.png)
-![image](https://user-images.githubusercontent.com/98745466/199354582-e5148506-59c4-4b66-aceb-467192c8bb26.png)
-![image](https://user-images.githubusercontent.com/98745466/199354605-c7583251-b0e0-44f3-80ad-308f45ccb7a3.png)
-![image](https://user-images.githubusercontent.com/98745466/199354612-be35bf0e-b6f7-4ad2-82df-25546a257163.png)
-![image](https://user-images.githubusercontent.com/98745466/199354624-9364b5f0-61f3-4a1e-898e-cb6bf1b9409f.png)
-![image](https://user-images.githubusercontent.com/98745466/199354634-4484fdeb-7a2a-4cef-9676-5254179ae887.png)
+![image](https://user-images.githubusercontent.com/98745466/199365959-fc018445-be03-46c1-bbbc-84ba2fe691ea.png)
+![image](https://user-images.githubusercontent.com/98745466/199365980-43714ed1-5dad-46a8-88f6-e642c54c1b9d.png)
+![image](https://user-images.githubusercontent.com/98745466/199365990-e879e02a-c979-49e1-8812-d1e1c9d9bdec.png)
+![image](https://user-images.githubusercontent.com/98745466/199366010-25a3d017-6966-4432-acf1-d4c2fa09f41f.png)
+![image](https://user-images.githubusercontent.com/98745466/199366024-c9924d13-db04-4b26-919f-00b551f1a07c.png)
+![image](https://user-images.githubusercontent.com/98745466/199366039-2fa29097-f877-4ec4-946f-fb0b08f32fce.png)
+![image](https://user-images.githubusercontent.com/98745466/199366054-c520ab74-35bf-487f-8aff-97622391a9e0.png)
+![image](https://user-images.githubusercontent.com/98745466/199366103-2789f56a-87d5-4562-8ab5-c2833986345e.png)
+
